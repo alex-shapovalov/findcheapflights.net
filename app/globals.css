@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --ink: #071018;
   --panel: #0e1a24;
   --panel-2: #132333;
@@ -12,8 +13,49 @@
   --teal: #6fd3c2;
   --danger: #e85d4c;
   --go: #3dcc8a;
+  --on-gold: #071018;
+  --elev: 0 20px 80px rgba(0, 0, 0, 0.35);
+  --wash-gold: rgba(232, 184, 74, 0.12);
+  --wash-teal: rgba(111, 211, 194, 0.08);
   --background: var(--ink);
   --foreground: var(--foam);
+  --clerk-color-primary: var(--gold);
+  --clerk-color-primary-foreground: var(--on-gold);
+  --clerk-color-foreground: var(--foam);
+  --clerk-color-muted-foreground: var(--mute);
+  --clerk-color-background: var(--panel);
+  --clerk-color-muted: var(--panel-2);
+  --clerk-color-input: var(--panel-2);
+  --clerk-color-input-foreground: var(--foam);
+  --clerk-color-border: var(--line);
+  --clerk-color-danger: var(--danger);
+  --clerk-color-success: var(--go);
+  --clerk-color-neutral: #8aa0b2;
+  --clerk-color-ring: var(--gold);
+  --clerk-color-modal-backdrop: rgba(7, 16, 24, 0.72);
+  --clerk-border-radius: 0.75rem;
+  --clerk-font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+html.light {
+  color-scheme: light;
+  --ink: #f3f6f9;
+  --panel: #ffffff;
+  --panel-2: #e8eef3;
+  --line: #c5d4df;
+  --foam: #10202c;
+  --mute: #5a7182;
+  --gold: #b8860b;
+  --gold-2: #9a7209;
+  --teal: #0f8a7a;
+  --danger: #c73e30;
+  --go: #178a58;
+  --on-gold: #071018;
+  --elev: 0 16px 48px rgba(16, 32, 44, 0.1);
+  --wash-gold: rgba(184, 134, 11, 0.1);
+  --wash-teal: rgba(15, 138, 122, 0.08);
+  --clerk-color-neutral: #5a7182;
+  --clerk-color-modal-backdrop: rgba(16, 32, 44, 0.45);
 }
 
 @theme inline {
@@ -30,30 +72,29 @@
   --color-teal: var(--teal);
   --color-danger: var(--danger);
   --color-go: var(--go);
+  --color-on-gold: var(--on-gold);
   --font-sans: var(--font-geist-sans);
   --font-display: var(--font-fraunces);
   --font-mono: var(--font-geist-mono);
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 html {
+  overflow-x: clip;
   background: var(--ink);
   color: var(--foam);
 }
 
 body {
   min-height: 100%;
+  overflow-x: clip;
   background:
-    radial-gradient(
-      1200px 600px at 10% -10%,
-      rgba(232, 184, 74, 0.12),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 500px at 100% 0%,
-      rgba(111, 211, 194, 0.08),
-      transparent 50%
-    ),
-    linear-gradient(180deg, #071018 0%, #0a1620 45%, #071018 100%);
+    radial-gradient(1200px 600px at 10% -10%, var(--wash-gold), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, var(--wash-teal), transparent 50%),
+    var(--ink);
   color: var(--foam);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
@@ -63,7 +104,7 @@ body {
 }
 
 ::selection {
-  background: rgba(232, 184, 74, 0.35);
+  background: color-mix(in srgb, var(--gold) 35%, transparent);
   color: var(--foam);
 }
 
@@ -72,4 +113,62 @@ select,
 textarea,
 button {
   font: inherit;
+  color-scheme: inherit;
+}
+
+.cl-cardBox,
+.cl-modalContent,
+.cl-rootBox {
+  width: min(100%, 25rem) !important;
+  max-width: calc(100vw - 1.5rem) !important;
+}
+
+.cl-modalContent {
+  max-height: min(90dvh, 42rem);
+  overflow-y: auto;
+}
+
+.cl-headerTitle,
+.cl-formFieldLabel {
+  color: var(--foam) !important;
+}
+
+.cl-headerSubtitle,
+.cl-footerActionText,
+.cl-dividerText,
+.cl-formFieldHintText {
+  color: var(--mute) !important;
+}
+
+.cl-socialButtonsBlockButton,
+.cl-socialButtonsBlockButtonText,
+.cl-buttonArrowIcon,
+.cl-formButtonReset {
+  color: var(--foam) !important;
+}
+
+.cl-socialButtonsBlockButton {
+  background: var(--panel-2) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: none !important;
+}
+
+.cl-formButtonPrimary {
+  background: var(--gold) !important;
+  color: var(--on-gold) !important;
+}
+
+.cl-footerActionLink,
+.cl-formResendCodeLink {
+  color: var(--gold) !important;
+}
+
+.cl-identityPreviewEditButton,
+.cl-formFieldInput {
+  color: var(--foam) !important;
+}
+
+.cl-formFieldInput {
+  background: var(--panel-2) !important;
+  border-color: var(--line) !important;
 }

@@ -1,8 +1,12 @@
 import { APP_URL, OPENROUTER_MODEL } from './constants'
 import { buildFlightHuntPrompt } from './prompt'
+import { FARE_REPORT_SCHEMA } from './report-schema'
 import type { SearchRequest } from './types'
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+
+const SYSTEM_PROMPT =
+  'You are a rigorous airfare deal hunter. Never hallucinate. Never invent prices, dates, airlines, event lineups, airport codes, or URLs. If you did not observe a fact on a page or search result in this run, omit it or set the field to null. Fetch Skyscanner cheapest-month and routes/deal-listing pages first. One-stop itineraries are the default hunt; do not filter to nonstop. Convert non-USD prices to USD. Skyscanner "from £X" cards are often one-way — for round-trip hunts, follow the exact deal href through to a return total instead of discarding them. bookingUrl and sourceUrl must be copied verbatim from an observed href for that specific fare — never a generic search you constructed. The price you report must be the cheapest qualifying fare on that exact URL. Prefer primary sources and current search pages over recaps. If coverage is incomplete, say exactly what you checked and what you could not verify. Reply with a single JSON object that matches the requested schema and nothing else. Every deal must include originAirport and destinationAirport as uppercase 3-letter IATA codes (for example TPA and KEF), plus destinationCity as a city name. Never return an empty deals array: if the cap is missed, return the closest currently bookable fares instead.'
 
 export async function streamFlightHunt(input: SearchRequest) {
   const apiKey = process.env.OPENROUTER_API_KEY
@@ -10,16 +14,34 @@ export async function streamFlightHunt(input: SearchRequest) {
     throw new Error('OPENROUTER_API_KEY is not configured')
   }
 
-  const today = new Date().toISOString().slice(0, 10)
-  const prompt = buildFlightHuntPrompt(input, today)
-  const appUrl = APP_URL
+  const prompt = buildFlightHuntPrompt(input, new Date())
 
-  const response = await fetch(OPENROUTER_URL, {
+  let response = await requestHunt(apiKey, prompt, true)
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '')
+    if (!isSchemaUnsupported(response.status, detail)) {
+      throw new Error(`Request failed (${response.status})`)
+    }
+    response = await requestHunt(apiKey, prompt, false)
+  }
+
+  if (!response.ok || !response.body) {
+    const detail = await response.text().catch(() => '')
+    throw new Error(`Request failed (${response.status})`)
+  }
+
+  return response.body
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough(openRouterTextStream())
+}
+
+function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
+  return fetch(OPENROUTER_URL, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
-      'HTTP-Referer': appUrl,
+      'HTTP-Referer': APP_URL,
       'X-Title': 'Find Cheap Flights',
     },
     body: JSON.stringify({
@@ -27,13 +49,17 @@ export async function streamFlightHunt(input: SearchRequest) {
       stream: true,
       temperature: 0.2,
       messages: [
-        {
-          role: 'system',
-          content:
-            'You are a rigorous airfare deal hunter. Use web search and page fetch tools aggressively to inspect live/public fare results. Prefer primary sources and current search pages over recaps. Never invent prices, dates, airlines, or event lineups. If coverage is incomplete, say exactly what you checked and what you could not verify.',
-        },
+        { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: prompt },
       ],
+      ...(withSchema
+        ? {
+            response_format: {
+              type: 'json_schema',
+              json_schema: FARE_REPORT_SCHEMA,
+            },
+          }
+        : {}),
       tools: [
         {
           type: 'openrouter:datetime',
@@ -41,32 +67,26 @@ export async function streamFlightHunt(input: SearchRequest) {
         {
           type: 'openrouter:web_search',
           parameters: {
-            max_results: 8,
-            max_uses: 18,
+            max_results: 10,
+            max_uses: 24,
           },
         },
         {
           type: 'openrouter:web_fetch',
           parameters: {
-            max_uses: 12,
-            max_content_tokens: 20000,
+            max_uses: 20,
+            max_content_tokens: 24000,
           },
         },
       ],
     }),
     signal: AbortSignal.timeout(270_000),
   })
+}
 
-  if (!response.ok || !response.body) {
-    const detail = await response.text().catch(() => '')
-    throw new Error(
-      `OpenRouter request failed (${response.status}): ${detail.slice(0, 500)}`,
-    )
-  }
-
-  return response.body
-    .pipeThrough(new TextDecoderStream())
-    .pipeThrough(openRouterTextStream())
+function isSchemaUnsupported(status: number, detail: string) {
+  if (status !== 400 && status !== 404 && status !== 422) return false
+  return /response_format|json_schema|structured output/i.test(detail)
 }
 
 function openRouterTextStream() {

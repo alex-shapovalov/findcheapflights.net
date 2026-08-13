@@ -115,7 +115,7 @@ function PlanCard({
       }
     >
       <p className="text-xs uppercase tracking-[0.2em] text-mute">{name}</p>
-      <p className="mt-3 font-display text-5xl text-gold">
+      <p className="mt-3 font-display text-4xl text-gold sm:text-5xl">
         {price}
         <span className="ml-2 text-lg text-mute">{cadence}</span>
       </p>
@@ -130,7 +130,7 @@ function PlanCard({
         <button
           type="button"
           onClick={onClick}
-          className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-ink"
+          className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-on-gold"
         >
           {cta}
         </button>
@@ -138,7 +138,7 @@ function PlanCard({
         <SignInButton mode="modal">
           <button
             type="button"
-            className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-ink"
+            className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-on-gold"
           >
             Sign in to subscribe
           </button>

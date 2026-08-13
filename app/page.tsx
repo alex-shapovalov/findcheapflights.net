@@ -17,7 +17,7 @@ export const metadata = pageMetadata({
 
 export default function HomePage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:py-16">
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <JsonLd
         data={[
           websiteJsonLd(),
@@ -30,7 +30,7 @@ export default function HomePage() {
         <p className="text-xs uppercase tracking-[0.28em] text-gold">
           findcheapflights.net
         </p>
-        <h1 className="mt-3 font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+        <h1 className="mt-3 font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
           Find cheap flights.
           <span className="block text-gold">
             Pack if it&apos;s stupid cheap.

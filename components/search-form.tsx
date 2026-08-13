@@ -2,7 +2,8 @@
 
 import { SignInButton, useUser } from '@clerk/nextjs'
 import { LoaderCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { SearchReport } from '@/components/search-report'
 import { nearbyAirports } from '@/lib/airports'
 import { cn } from '@/lib/cn'
 import type { Continent } from '@/lib/constants'
@@ -18,7 +19,6 @@ import type {
   TripType,
 } from '@/lib/types'
 import { AirportPicker } from './airport-picker'
-import { SearchReport } from './search-report'
 
 const INTEREST_CHIPS = [
   'Electronic music, raves, clubs, EDM festivals',
@@ -58,10 +58,21 @@ export function SearchForm() {
   )
   const [error, setError] = useState('')
   const [paywall, setPaywall] = useState(false)
+  const outcomeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     refreshQuota()
   }, [isSignedIn])
+
+  useEffect(() => {
+    if (status !== 'running') return
+    window.history.replaceState(null, '', '#report')
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    outcomeRef.current?.scrollIntoView({
+      behavior: reduceMotion.matches ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }, [status])
 
   async function refreshQuota() {
     const response = await fetch('/api/me')
@@ -162,11 +173,14 @@ export function SearchForm() {
     await refreshQuota()
   }
 
+  const hasOutcome =
+    paywall || Boolean(error) || status === 'running' || Boolean(report)
+
   return (
     <div className="space-y-8">
       <form
         onSubmit={onSubmit}
-        className="rounded-3xl border border-line bg-panel/90 p-5 shadow-[0_20px_80px_rgba(0,0,0,0.35)] sm:p-8"
+        className="rounded-3xl border border-line bg-panel/90 p-4 shadow-(--elev) sm:p-8"
       >
         <div className="mb-6 flex flex-wrap gap-2">
           {(
@@ -180,9 +194,9 @@ export function SearchForm() {
               type="button"
               onClick={() => setMode(value)}
               className={cn(
-                'rounded-full border px-4 py-2 text-sm',
+                'rounded-full border px-3 py-2 text-xs sm:px-4 sm:text-sm',
                 mode === value
-                  ? 'border-gold bg-gold text-ink'
+                  ? 'border-gold bg-gold text-on-gold'
                   : 'border-line text-mute hover:text-foam',
               )}
             >
@@ -200,7 +214,7 @@ export function SearchForm() {
             }
             values={originAirports}
             onChange={setOriginAirports}
-            placeholder="PIT, CLE, IAD..."
+            placeholder="Pittsburgh, Cleveland, IAD..."
           />
           <button
             type="button"
@@ -351,7 +365,7 @@ export function SearchForm() {
             <button
               type="submit"
               disabled={status === 'running'}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 font-medium text-ink disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 font-medium text-on-gold disabled:opacity-60 sm:w-auto"
             >
               {status === 'running' && (
                 <LoaderCircle className="h-4 w-4 animate-spin" />
@@ -362,7 +376,7 @@ export function SearchForm() {
             <SignInButton mode="modal">
               <button
                 type="button"
-                className="rounded-full bg-gold px-6 py-3 font-medium text-ink"
+                className="w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto"
               >
                 Sign in to hunt
               </button>
@@ -371,54 +385,59 @@ export function SearchForm() {
         </div>
       </form>
 
-      {paywall && (
-        <div className="rounded-3xl border border-gold/40 bg-panel p-6">
-          <h2 className="font-display text-2xl text-gold">
-            Your free hunt is used
-          </h2>
-          <p className="mt-2 max-w-xl text-mute">
-            Pro is $5/month or $50/year and includes 25 live fare hunts per day.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {isSignedIn ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('month')}
-                  className="rounded-full bg-gold px-5 py-2 text-sm font-medium text-ink"
-                >
-                  $5 / month
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('year')}
-                  className="rounded-full border border-gold px-5 py-2 text-sm text-gold"
-                >
-                  $50 / year
-                </button>
-              </>
-            ) : (
-              <SignInButton mode="modal">
-                <button
-                  type="button"
-                  className="rounded-full bg-gold px-5 py-2 text-sm font-medium text-ink"
-                >
-                  Sign in to unlock Pro
-                </button>
-              </SignInButton>
-            )}
-          </div>
+      {hasOutcome && (
+        <div id="report" ref={outcomeRef} className="scroll-mt-20 space-y-8">
+          {paywall && (
+            <div className="rounded-3xl border border-gold/40 bg-panel p-6">
+              <h2 className="font-display text-2xl text-gold">
+                Your free hunt is used
+              </h2>
+              <p className="mt-2 max-w-xl text-mute">
+                Pro is $5/month or $50/year and includes 25 live fare hunts per
+                day.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {isSignedIn ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => startCheckout('month')}
+                      className="rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold"
+                    >
+                      $5 / month
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => startCheckout('year')}
+                      className="rounded-full border border-gold px-5 py-2 text-sm text-gold"
+                    >
+                      $50 / year
+                    </button>
+                  </>
+                ) : (
+                  <SignInButton mode="modal">
+                    <button
+                      type="button"
+                      className="rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold"
+                    >
+                      Sign in to unlock Pro
+                    </button>
+                  </SignInButton>
+                )}
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <p className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+              {error}
+            </p>
+          )}
+
+          {(status === 'running' || report) && (
+            <SearchReport text={report} running={status === 'running'} />
+          )}
         </div>
-      )}
-
-      {error && (
-        <p className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-          {error}
-        </p>
-      )}
-
-      {(status === 'running' || report) && (
-        <SearchReport text={report} running={status === 'running'} />
       )}
     </div>
   )

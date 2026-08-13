@@ -10,7 +10,7 @@ export function Footer() {
           </Link>{' '}
           — find cheap flights with flexible-date fare hunting, not a GDS.
         </p>
-        <nav aria-label="Footer" className="flex gap-4">
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2">
           <Link href="/" className="hover:text-foam">
             Hunt
           </Link>

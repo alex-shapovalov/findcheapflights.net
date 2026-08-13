@@ -38,7 +38,6 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
   function add(airport: Airport) {
     if (values.includes(airport.iata)) return
     onChange([...values, airport.iata].slice(0, 12))
-    setQuery('')
     setOpen(true)
   }
 
@@ -61,7 +60,7 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
               key={airport.iata}
               type="button"
               onClick={() => remove(airport.iata)}
-              className="inline-flex items-center gap-1 rounded-full bg-ink px-2.5 py-1 text-sm text-gold"
+              className="inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2.5 py-1 text-sm text-gold"
             >
               {airport.iata}
               <X className="h-3 w-3" />
@@ -76,30 +75,38 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder ?? 'Search city or IATA'}
-            className="min-w-[10rem] flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-mute"
+            className="min-w-0 flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-mute"
           />
         </div>
       </div>
       {open && (
-        <ul className="overflow-hidden rounded-xl border border-line bg-panel shadow-xl">
-          {results.map(airport => (
-            <li key={airport.iata}>
-              <button
-                type="button"
-                onClick={() => add(airport)}
-                className={cn(
-                  'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-panel-2',
-                  values.includes(airport.iata) && 'text-mute',
-                )}
-              >
-                <span>
-                  <span className="font-medium text-gold">{airport.iata}</span>{' '}
-                  {formatAirport(airport)}
-                </span>
-                <span className="text-xs text-mute">{airport.country}</span>
-              </button>
+        <ul className="max-h-60 overflow-auto rounded-xl border border-line bg-panel shadow-xl">
+          {results.length === 0 ? (
+            <li className="px-3 py-2 text-sm text-mute">
+              No matching airports
             </li>
-          ))}
+          ) : (
+            results.map(airport => (
+              <li key={airport.iata}>
+                <button
+                  type="button"
+                  onClick={() => add(airport)}
+                  className={cn(
+                    'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-panel-2',
+                    values.includes(airport.iata) && 'text-mute',
+                  )}
+                >
+                  <span>
+                    <span className="font-medium text-gold">
+                      {airport.iata}
+                    </span>{' '}
+                    {formatAirport(airport)}
+                  </span>
+                  <span className="text-xs text-mute">{airport.country}</span>
+                </button>
+              </li>
+            ))
+          )}
         </ul>
       )}
     </div>

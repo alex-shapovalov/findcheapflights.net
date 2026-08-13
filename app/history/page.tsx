@@ -3,13 +3,14 @@
 import { useQuery } from 'convex/react'
 import Link from 'next/link'
 import { api } from '@/convex/_generated/api'
+import type { Doc } from '@/convex/_generated/dataModel'
 
 export default function HistoryPage() {
   const searches = useQuery(api.searches.listMine)
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-16">
-      <h1 className="font-display text-4xl">Past hunts</h1>
+    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16">
+      <h1 className="font-display text-3xl sm:text-4xl">Past hunts</h1>
       <p className="mt-2 text-mute">
         Your fare reports stay here after the stream finishes.
       </p>
@@ -18,14 +19,14 @@ export default function HistoryPage() {
         {searches?.length === 0 && (
           <p className="text-mute">No searches yet.</p>
         )}
-        {searches?.map(search => (
+        {searches?.map((search: Doc<'searches'>) => (
           <Link
             key={search._id}
             href={`/history/${search._id}`}
             className="block rounded-2xl border border-line bg-panel px-4 py-4 hover:border-gold"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-medium">
+              <p className="wrap-break-word font-medium">
                 {search.mode === 'flexible_destination'
                   ? `${search.originAirports.join(', ')} → ${search.continent}`
                   : `${search.originAirports.join(', ')} → ${search.destinationAirports.join(', ')}`}

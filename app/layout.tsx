@@ -1,15 +1,10 @@
-import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Geist, Geist_Mono } from 'next/font/google'
+import { cookies } from 'next/headers'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import { Providers } from '@/components/providers'
-import {
-  AFTER_AUTH_PATH,
-  SIGN_IN_PATH,
-  SIGN_UP_PATH,
-  SITE_URL,
-} from '@/lib/constants'
+import { SITE_URL } from '@/lib/constants'
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
@@ -17,6 +12,7 @@ import {
   SITE_NAME,
   TITLE_TEMPLATE,
 } from '@/lib/seo'
+import { parseTheme, THEME_STORAGE_KEY } from '@/lib/theme'
 import './globals.css'
 
 const geistSans = Geist({
@@ -80,40 +76,30 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: LayoutProps<'/'>) {
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
+  const theme = parseTheme((await cookies()).get(THEME_STORAGE_KEY)?.value)
+
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${theme} h-full antialiased`}
+      style={{ colorScheme: theme }}
     >
       <body className="flex min-h-full flex-col">
-        <ClerkProvider
-          signInUrl={SIGN_IN_PATH}
-          signUpUrl={SIGN_UP_PATH}
-          signInFallbackRedirectUrl={AFTER_AUTH_PATH}
-          signUpFallbackRedirectUrl={AFTER_AUTH_PATH}
-          appearance={{
-            variables: {
-              colorPrimary: '#e8b84a',
-              colorBackground: '#0e1a24',
-              borderRadius: '0.75rem',
-            },
-          }}
-        >
-          <Providers>
-            <a
-              href="#main"
-              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold focus:px-3 focus:py-2 focus:text-ink"
-            >
-              Skip to content
-            </a>
-            <Header />
-            <main id="main" className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </Providers>
-        </ClerkProvider>
+        <Providers initialTheme={theme}>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold focus:px-3 focus:py-2 focus:text-on-gold"
+          >
+            Skip to content
+          </a>
+          <Header />
+          <main id="main" className="min-w-0 flex-1">
+            {children}
+          </main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   )

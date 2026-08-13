@@ -13,18 +13,18 @@ export default function HistoryDetailPage() {
   })
 
   if (search === undefined) {
-    return <p className="px-4 py-16 text-mute">Loading...</p>
+    return <p className="px-4 py-10 text-mute sm:py-16">Loading...</p>
   }
   if (!search) {
-    return <p className="px-4 py-16 text-mute">Search not found.</p>
+    return <p className="px-4 py-10 text-mute sm:py-16">Search not found.</p>
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-16">
+    <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16">
       <p className="text-xs uppercase tracking-[0.2em] text-gold">
         {search.status}
       </p>
-      <h1 className="mt-2 font-display text-4xl">
+      <h1 className="mt-2 wrap-break-word font-display text-3xl sm:text-4xl">
         {search.mode === 'flexible_destination'
           ? `${search.originAirports.join(', ')} → ${search.continent}`
           : `${search.originAirports.join(', ')} → ${search.destinationAirports.join(', ')}`}

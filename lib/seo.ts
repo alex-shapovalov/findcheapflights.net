@@ -37,6 +37,22 @@ export const noIndexMetadata = {
   robots: noIndexRobots,
 } satisfies Metadata
 
+export const INDEXABLE_PATHS = new Set(['/', '/pricing'])
+
+export const X_ROBOTS_INDEX =
+  'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+
+export const X_ROBOTS_NOINDEX = 'noindex, nofollow'
+
+export function xRobotsTag(pathname: string) {
+  const isPreview =
+    process.env.VERCEL_ENV != null && process.env.VERCEL_ENV !== 'production'
+  if (!isPreview && INDEXABLE_PATHS.has(pathname)) {
+    return X_ROBOTS_INDEX
+  }
+  return X_ROBOTS_NOINDEX
+}
+
 export function pageMetadata({
   title,
   description,
