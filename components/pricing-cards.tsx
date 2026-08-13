@@ -106,12 +106,15 @@ function PlanCard({
   signedIn: boolean
   onClick: () => void
 }) {
+  const buttonClass =
+    'w-full rounded-full bg-gold py-3 font-medium text-on-gold'
+
   return (
     <div
       className={
         featured
-          ? 'rounded-3xl border border-gold bg-panel p-6'
-          : 'rounded-3xl border border-line bg-panel p-6'
+          ? 'flex h-full flex-col rounded-3xl border border-gold bg-panel p-6'
+          : 'flex h-full flex-col rounded-3xl border border-line bg-panel p-6'
       }
     >
       <p className="text-xs uppercase tracking-[0.2em] text-mute">{name}</p>
@@ -126,24 +129,19 @@ function PlanCard({
         <li>Round trip or one way, with price bounds</li>
         <li>Saved search history</li>
       </ul>
-      {signedIn ? (
-        <button
-          type="button"
-          onClick={onClick}
-          className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-on-gold"
-        >
-          {cta}
-        </button>
-      ) : (
-        <SignInButton mode="modal">
-          <button
-            type="button"
-            className="mt-6 w-full rounded-full bg-gold py-3 font-medium text-on-gold"
-          >
-            Sign in to subscribe
+      <div className="mt-auto pt-6">
+        {signedIn ? (
+          <button type="button" onClick={onClick} className={buttonClass}>
+            {cta}
           </button>
-        </SignInButton>
-      )}
+        ) : (
+          <SignInButton mode="modal">
+            <button type="button" className={buttonClass}>
+              Sign in to subscribe
+            </button>
+          </SignInButton>
+        )}
+      </div>
     </div>
   )
 }
