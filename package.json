@@ -1,0 +1,39 @@
+{
+  "name": "findcheapflights.net",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n next,convex,stripe -c cyan,magenta,yellow --kill-others-on-fail \"next dev\" \"convex dev\" \"pnpm stripe:listen\"",
+    "dev:next": "next dev",
+    "dev:convex": "convex dev",
+    "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/stripe/webhook --latest",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check --diagnostic-level=error",
+    "lint:fix": "biome check --diagnostic-level=error --fix",
+    "lint:eslint": "eslint"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^7.7.4",
+    "@upstash/redis": "^1.38.2",
+    "convex": "^1.43.0",
+    "lucide-react": "^1.31.0",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "stripe": "^22.5.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.5",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.30.3"
+}
