@@ -12,6 +12,14 @@ export function getConvexClient() {
   return new ConvexHttpClient(convexUrl())
 }
 
+export function convexServerSecret() {
+  const secret = process.env.CONVEX_SERVER_SECRET
+  if (!secret) {
+    throw new Error('CONVEX_SERVER_SECRET is not configured')
+  }
+  return secret
+}
+
 export async function getAuthedConvex() {
   const { getToken } = await auth()
   const token = await getToken({ template: 'convex' })

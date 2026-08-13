@@ -1,11 +1,16 @@
+import type { FunctionArgs } from 'convex/server'
 import { api } from '@/convex/_generated/api'
 import type { Doc } from '@/convex/_generated/dataModel'
-import type { getAuthedConvex } from './convex-server'
+import { convexServerSecret, getConvexClient } from './convex-server'
 import {
   billingFromSubscription,
   isActiveSubscriptionStatus,
   latestSubscription,
 } from './stripe'
+
+type SyncBillingArgs = FunctionArgs<typeof api.users.syncBilling>
+
+export type BillingFields = Omit<SyncBillingArgs, 'serverSecret' | 'clerkId'>
 
 export function hasActiveAccess(
   user: Pick<Doc<'users'>, 'subscriptionStatus' | 'currentPeriodEnd'> | null,
@@ -16,10 +21,18 @@ export function hasActiveAccess(
   )
 }
 
-export async function refreshBilling(
-  convex: Awaited<ReturnType<typeof getAuthedConvex>>,
-  user: Doc<'users'> | null,
+export async function syncBilling(
+  clerkId: string | undefined,
+  billing: BillingFields,
 ) {
+  await getConvexClient().mutation(api.users.syncBilling, {
+    serverSecret: convexServerSecret(),
+    clerkId,
+    ...billing,
+  })
+}
+
+export async function refreshBilling(user: Doc<'users'> | null) {
   if (!user?.stripeCustomerId) return user
   if (
     hasActiveAccess(user) &&
@@ -31,7 +44,7 @@ export async function refreshBilling(
 
   const subscription = await latestSubscription(user.stripeCustomerId)
   if (!subscription) {
-    await convex.mutation(api.users.saveBilling, {
+    await syncBilling(user.clerkId, {
       stripeCustomerId: user.stripeCustomerId,
       subscriptionStatus: 'none',
     })
@@ -45,6 +58,6 @@ export async function refreshBilling(
   }
 
   const billing = billingFromSubscription(subscription)
-  await convex.mutation(api.users.saveBilling, billing)
+  await syncBilling(user.clerkId, billing)
   return { ...user, ...billing }
 }

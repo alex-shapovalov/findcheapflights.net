@@ -1,13 +1,23 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import {
+  boundedString,
+  consumeWriteBudget,
+  MAX_AIRPORTS,
+  MAX_ERROR_CHARS,
+  MAX_INTERESTS_CHARS,
+  MAX_RESULT_CHARS,
+  requireClerkId,
+} from './guards'
 import { searchMode, tripType } from './schema'
 
-async function requireClerkId(ctx: {
-  auth: { getUserIdentity: () => Promise<{ subject: string } | null> }
-}) {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) throw new Error('Not authenticated')
-  return identity.subject
+const IATA = /^[A-Z]{3}$/
+
+function iataCodes(codes: string[]) {
+  const cleaned = codes
+    .map(code => code.trim().toUpperCase())
+    .filter(code => IATA.test(code))
+  return [...new Set(cleaned)].slice(0, MAX_AIRPORTS)
 }
 
 export const create = mutation({
@@ -27,9 +37,27 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const clerkId = await requireClerkId(ctx)
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_clerkId', q => q.eq('clerkId', clerkId))
+      .unique()
+    if (!user) throw new Error('User not found')
+    await consumeWriteBudget(ctx, user)
+
+    const originAirports = iataCodes(args.originAirports)
+    if (originAirports.length === 0) {
+      throw new Error('At least one origin airport is required')
+    }
+
     return await ctx.db.insert('searches', {
-      clerkId,
       ...args,
+      clerkId,
+      originAirports,
+      destinationAirports: iataCodes(args.destinationAirports),
+      continent: args.continent ? boundedString(args.continent, 40) : undefined,
+      interests: args.interests
+        ? boundedString(args.interests, MAX_INTERESTS_CHARS)
+        : undefined,
       status: 'running',
     })
   },
@@ -46,9 +74,12 @@ export const complete = mutation({
     if (!search || search.clerkId !== clerkId) {
       throw new Error('Search not found')
     }
+    if (search.status !== 'running') {
+      throw new Error('Search is already finished')
+    }
     await ctx.db.patch(args.id, {
       status: 'complete',
-      result: args.result,
+      result: boundedString(args.result, MAX_RESULT_CHARS),
     })
   },
 })
@@ -64,9 +95,12 @@ export const fail = mutation({
     if (!search || search.clerkId !== clerkId) {
       throw new Error('Search not found')
     }
+    if (search.status !== 'running') {
+      throw new Error('Search is already finished')
+    }
     await ctx.db.patch(args.id, {
       status: 'failed',
-      error: args.error,
+      error: boundedString(args.error, MAX_ERROR_CHARS),
     })
   },
 })

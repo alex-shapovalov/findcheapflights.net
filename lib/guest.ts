@@ -1,21 +1,12 @@
 import { cookies } from 'next/headers'
 import { api } from '@/convex/_generated/api'
-import { FREE_SEARCH_LIMIT, GUEST_IP_DAILY_LIMIT } from './constants'
+import { FREE_IP_DAILY_LIMIT, FREE_SEARCH_LIMIT } from './constants'
 import type { getAuthedConvex } from './convex-server'
-import { getGuestIpUsage, getGuestUsage } from './redis'
+import { getFreeIpUsage, getGuestUsage } from './redis'
 
 const GUEST_COOKIE = 'fcf_guest'
 const GUEST_MAX_AGE = 60 * 60 * 24 * 90
 const GUEST_ID = /^[0-9a-f-]{36}$/i
-
-export function clientIp(request: Request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  if (forwarded) {
-    const first = forwarded.split(',')[0]?.trim()
-    if (first) return first
-  }
-  return request.headers.get('x-real-ip')?.trim() || 'unknown'
-}
 
 export async function getGuestId() {
   const store = await cookies()
@@ -34,8 +25,8 @@ export async function getGuestId() {
 
 export async function guestQuota(guestId: string, ip: string) {
   const used = await getGuestUsage(guestId)
-  const ipUsed = await getGuestIpUsage(ip)
-  const paywalled = used >= FREE_SEARCH_LIMIT || ipUsed >= GUEST_IP_DAILY_LIMIT
+  const ipUsed = await getFreeIpUsage(ip)
+  const paywalled = used >= FREE_SEARCH_LIMIT || ipUsed >= FREE_IP_DAILY_LIMIT
   return {
     lifetimeUsed: used,
     remaining: paywalled ? 0 : Math.max(0, FREE_SEARCH_LIMIT - used),

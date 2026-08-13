@@ -37,7 +37,7 @@ export const noIndexMetadata = {
   robots: noIndexRobots,
 } satisfies Metadata
 
-export const INDEXABLE_PATHS = new Set(['/', '/pricing'])
+export const INDEXABLE_PATHS = new Set(['/', '/pricing', '/terms', '/privacy'])
 
 export const X_ROBOTS_INDEX =
   'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'

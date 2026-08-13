@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as guards from "../guards.js";
 import type * as searches from "../searches.js";
 import type * as users from "../users.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  guards: typeof guards;
   searches: typeof searches;
   users: typeof users;
 }>;

@@ -1,7 +1,10 @@
 import type Stripe from 'stripe'
-import { api } from '@/convex/_generated/api'
-import { getConvexClient } from '@/lib/convex-server'
-import { billingFromSubscription, getStripe } from '@/lib/stripe'
+import { syncBilling } from '@/lib/billing'
+import {
+  billingFromSubscription,
+  getStripe,
+  normalizeSubscriptionStatus,
+} from '@/lib/stripe'
 
 export const runtime = 'nodejs'
 
@@ -26,7 +29,6 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Invalid signature.' }, { status: 400 })
   }
 
-  const convex = getConvexClient()
   const stripe = getStripe()
 
   if (event.type === 'checkout.session.completed') {
@@ -41,14 +43,12 @@ export async function POST(request: Request) {
     const subscription = await stripe.subscriptions.retrieve(
       String(session.subscription),
     )
-    await convex.mutation(api.users.applyStripeEvent, {
-      webhookSecret: secret,
-      clerkId:
-        session.client_reference_id ??
+    await syncBilling(
+      session.client_reference_id ??
         session.metadata?.clerkId ??
         subscription.metadata.clerkId,
-      ...billingFromSubscription(subscription),
-    })
+      billingFromSubscription(subscription),
+    )
   }
 
   if (
@@ -57,14 +57,12 @@ export async function POST(request: Request) {
     event.type === 'customer.subscription.deleted'
   ) {
     const subscription = event.data.object as Stripe.Subscription
-    await convex.mutation(api.users.applyStripeEvent, {
-      webhookSecret: secret,
-      clerkId: subscription.metadata.clerkId || undefined,
+    await syncBilling(subscription.metadata.clerkId || undefined, {
       ...billingFromSubscription(subscription),
       subscriptionStatus:
         event.type === 'customer.subscription.deleted'
           ? 'canceled'
-          : subscription.status,
+          : normalizeSubscriptionStatus(subscription.status),
     })
   }
 

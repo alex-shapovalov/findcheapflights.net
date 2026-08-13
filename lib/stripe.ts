@@ -1,6 +1,18 @@
 import Stripe from 'stripe'
+import { SUBSCRIPTION_STATUSES, type SubscriptionStatus } from '@/convex/guards'
 
 let stripeClient: Stripe | null = null
+
+const KNOWN_STATUSES = new Set<string>(SUBSCRIPTION_STATUSES)
+
+export function normalizeSubscriptionStatus(
+  status: string | undefined,
+): SubscriptionStatus {
+  if (status && KNOWN_STATUSES.has(status)) {
+    return status as SubscriptionStatus
+  }
+  return 'none'
+}
 
 export function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
@@ -32,8 +44,17 @@ export function priceIdForInterval(interval: 'month' | 'year') {
   return id
 }
 
-export function intervalOf(subscription: Stripe.Subscription) {
-  return subscription.items.data[0]?.price.recurring?.interval
+const INTERVALS = new Set<string>(['day', 'week', 'month', 'year'])
+
+export type SubscriptionInterval = 'day' | 'week' | 'month' | 'year'
+
+export function intervalOf(
+  subscription: Stripe.Subscription,
+): SubscriptionInterval | undefined {
+  const interval = subscription.items.data[0]?.price.recurring?.interval
+  return interval && INTERVALS.has(interval)
+    ? (interval as SubscriptionInterval)
+    : undefined
 }
 
 export function periodEndMs(subscription: Stripe.Subscription) {
@@ -53,7 +74,7 @@ export function billingFromSubscription(subscription: Stripe.Subscription) {
   return {
     stripeCustomerId: String(subscription.customer),
     stripeSubscriptionId: subscription.id,
-    subscriptionStatus: subscription.status,
+    subscriptionStatus: normalizeSubscriptionStatus(subscription.status),
     subscriptionInterval: intervalOf(subscription),
     currentPeriodEnd: periodEndMs(subscription),
   }

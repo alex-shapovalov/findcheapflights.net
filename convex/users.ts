@@ -1,14 +1,21 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
+import {
+  requireClerkId,
+  requireIdentity,
+  requireServerSecret,
+  subscriptionInterval,
+  subscriptionStatus,
+} from './guards'
 
-async function requireClerkId(ctx: {
-  auth: { getUserIdentity: () => Promise<{ subject: string } | null> }
-}) {
-  const identity = await ctx.auth.getUserIdentity()
-  if (!identity) {
-    throw new Error('Not authenticated')
-  }
-  return identity.subject
+const MAX_EMAIL_CHARS = 320
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function normalizeEmail(value: string | undefined) {
+  if (typeof value !== 'string') return undefined
+  const email = value.trim().toLowerCase()
+  if (email.length > MAX_EMAIL_CHARS || !EMAIL.test(email)) return undefined
+  return email
 }
 
 export const me = query({
@@ -26,20 +33,24 @@ export const me = query({
 export const ensure = mutation({
   args: { email: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    const clerkId = await requireClerkId(ctx)
+    const identity = await requireIdentity(ctx)
+    const clerkId = identity.subject
+    const email =
+      normalizeEmail(identity.email) ?? normalizeEmail(args.email) ?? undefined
+
     const existing = await ctx.db
       .query('users')
       .withIndex('by_clerkId', q => q.eq('clerkId', clerkId))
       .unique()
     if (existing) {
-      if (args.email && existing.email !== args.email) {
-        await ctx.db.patch(existing._id, { email: args.email })
+      if (email && existing.email !== email) {
+        await ctx.db.patch(existing._id, { email })
       }
       return existing._id
     }
     return await ctx.db.insert('users', {
       clerkId,
-      email: args.email,
+      email,
       lifetimeSearchCount: 0,
       subscriptionStatus: 'none',
     })
@@ -75,23 +86,18 @@ export const consumeFreeSearch = mutation({
   },
 })
 
-export const applyStripeEvent = mutation({
+export const syncBilling = mutation({
   args: {
-    webhookSecret: v.string(),
+    serverSecret: v.string(),
     clerkId: v.optional(v.string()),
     stripeCustomerId: v.string(),
     stripeSubscriptionId: v.optional(v.string()),
-    subscriptionStatus: v.string(),
-    subscriptionInterval: v.optional(v.string()),
+    subscriptionStatus,
+    subscriptionInterval: v.optional(subscriptionInterval),
     currentPeriodEnd: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    if (
-      !process.env.STRIPE_WEBHOOK_SECRET ||
-      args.webhookSecret !== process.env.STRIPE_WEBHOOK_SECRET
-    ) {
-      throw new Error('Unauthorized')
-    }
+    requireServerSecret(args.serverSecret)
 
     const patch = {
       stripeCustomerId: args.stripeCustomerId,
@@ -127,24 +133,5 @@ export const applyStripeEvent = mutation({
       lifetimeSearchCount: 0,
       ...patch,
     })
-  },
-})
-
-export const saveBilling = mutation({
-  args: {
-    stripeCustomerId: v.string(),
-    stripeSubscriptionId: v.optional(v.string()),
-    subscriptionStatus: v.string(),
-    subscriptionInterval: v.optional(v.string()),
-    currentPeriodEnd: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const clerkId = await requireClerkId(ctx)
-    const user = await ctx.db
-      .query('users')
-      .withIndex('by_clerkId', q => q.eq('clerkId', clerkId))
-      .unique()
-    if (!user) throw new Error('User not found')
-    await ctx.db.patch(user._id, args)
   },
 })

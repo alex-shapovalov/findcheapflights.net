@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { syncBilling } from '@/lib/billing'
 import { api, getAuthedConvex } from '@/lib/convex-server'
 import { noIndexMetadata } from '@/lib/seo'
 import { billingFromSubscription, getStripe } from '@/lib/stripe'
@@ -31,10 +32,7 @@ export default async function SuccessPage({
     ) {
       const convex = await getAuthedConvex()
       await convex.mutation(api.users.ensure, {})
-      await convex.mutation(
-        api.users.saveBilling,
-        billingFromSubscription(session.subscription),
-      )
+      await syncBilling(userId, billingFromSubscription(session.subscription))
     }
   }
 

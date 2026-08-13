@@ -1,16 +1,25 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import type { Id } from '@/convex/_generated/dataModel'
 import { hasActiveAccess, refreshBilling } from '@/lib/billing'
-import { FREE_SEARCH_LIMIT, SUBSCRIBER_DAILY_LIMIT } from '@/lib/constants'
+import {
+  FREE_SEARCH_LIMIT,
+  SEARCH_IP_BURST_LIMIT,
+  SEARCH_USER_BURST_LIMIT,
+  SUBSCRIBER_DAILY_LIMIT,
+} from '@/lib/constants'
 import { api, getAuthedConvex } from '@/lib/convex-server'
-import { applyGuestUsageToUser, clientIp, getGuestId } from '@/lib/guest'
+import { applyGuestUsageToUser, getGuestId } from '@/lib/guest'
 import { streamFlightHunt } from '@/lib/openrouter'
 import {
+  consumeBurst,
+  consumeFreeIpHunt,
   consumeGuestHunt,
   consumeSubscriberSearch,
+  refundFreeIpHunt,
   refundGuestHunt,
   refundSubscriberSearch,
 } from '@/lib/redis'
+import { clientIp, isTrustedOrigin } from '@/lib/request'
 import { parseSearchRequest } from '@/lib/validate'
 
 export const runtime = 'nodejs'
@@ -26,7 +35,15 @@ function paywallResponse() {
   )
 }
 
+function tooManyRequests(message: string) {
+  return Response.json({ error: 'rate_limited', message }, { status: 429 })
+}
+
 export async function POST(request: Request) {
+  if (!isTrustedOrigin(request)) {
+    return Response.json({ error: 'Invalid origin.' }, { status: 403 })
+  }
+
   let payload: ReturnType<typeof parseSearchRequest>
   try {
     payload = parseSearchRequest(await request.json())
@@ -40,12 +57,29 @@ export async function POST(request: Request) {
   const { userId } = await auth()
   const ip = clientIp(request)
 
+  const withinBurst = await consumeBurst([
+    { scope: 'search:ip', id: ip, limit: SEARCH_IP_BURST_LIMIT },
+    ...(userId
+      ? [
+          {
+            scope: 'search:user',
+            id: userId,
+            limit: SEARCH_USER_BURST_LIMIT,
+          },
+        ]
+      : []),
+  ])
+  if (!withinBurst) {
+    return tooManyRequests('Too many searches at once. Wait a minute.')
+  }
+
   if (!userId) {
     const guestId = await getGuestId()
     const consumed = await consumeGuestHunt(guestId, ip)
     if (!consumed.allowed) return paywallResponse()
     return huntResponse(payload, {
-      onFail: () => refundGuestHunt(guestId, ip),
+      onFail: (_message, refundable) =>
+        refundable ? refundGuestHunt(guestId, ip) : Promise.resolve(),
     })
   }
 
@@ -55,10 +89,7 @@ export async function POST(request: Request) {
     email: user?.primaryEmailAddress?.emailAddress,
   })
 
-  const profile = await refreshBilling(
-    convex,
-    await convex.query(api.users.me, {}),
-  )
+  const profile = await refreshBilling(await convex.query(api.users.me, {}))
   const subscribed = hasActiveAccess(profile)
   const lifetimeUsed = await applyGuestUsageToUser(
     convex,
@@ -66,7 +97,8 @@ export async function POST(request: Request) {
     subscribed,
   )
 
-  let reservedSubscriberSlot = false
+  let refundReservation: (() => Promise<unknown>) | null = null
+
   if (subscribed) {
     const daily = await consumeSubscriberSearch(userId)
     if (!daily.allowed) {
@@ -78,13 +110,17 @@ export async function POST(request: Request) {
         { status: 429 },
       )
     }
-    reservedSubscriberSlot = true
+    refundReservation = () => refundSubscriberSearch(userId)
   } else if (lifetimeUsed >= FREE_SEARCH_LIMIT) {
     return paywallResponse()
   } else {
+    const freeIp = await consumeFreeIpHunt(ip)
+    if (!freeIp.allowed) return paywallResponse()
     try {
       await convex.mutation(api.users.consumeFreeSearch, {})
+      refundReservation = () => refundFreeIpHunt(ip)
     } catch (error) {
+      await refundFreeIpHunt(ip).catch(() => undefined)
       if (error instanceof Error && error.message.includes('PAYWALL')) {
         return paywallResponse()
       }
@@ -97,11 +133,13 @@ export async function POST(request: Request) {
     searchId,
     onComplete: result =>
       convex.mutation(api.searches.complete, { id: searchId, result }),
-    onFail: async message => {
-      if (reservedSubscriberSlot) {
-        await refundSubscriberSearch(userId).catch(() => undefined)
+    onFail: async (message, refundable) => {
+      if (refundable && refundReservation) {
+        await refundReservation().catch(() => undefined)
       }
-      await convex.mutation(api.searches.fail, { id: searchId, error: message })
+      await convex
+        .mutation(api.searches.fail, { id: searchId, error: message })
+        .catch(() => undefined)
     },
   })
 }
@@ -111,31 +149,49 @@ function huntResponse(
   hooks: {
     searchId?: Id<'searches'>
     onComplete?: (result: string) => Promise<unknown>
-    onFail: (message: string) => Promise<unknown>
+    onFail: (message: string, refundable: boolean) => Promise<unknown>
   },
 ) {
   const encoder = new TextEncoder()
   let report = ''
+  let upstream: ReadableStreamDefaultReader<string> | null = null
+  let cancelled = false
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let started = false
       try {
-        const upstream = await streamFlightHunt(payload)
-        const reader = upstream.getReader()
+        upstream = (await streamFlightHunt(payload)).getReader()
+        started = true
         while (true) {
-          const { done, value } = await reader.read()
+          const { done, value } = await upstream.read()
           if (done) break
           report += value
           controller.enqueue(encoder.encode(value))
+        }
+        if (cancelled) {
+          await hooks
+            .onFail('Client disconnected', false)
+            .catch(() => undefined)
+          return
         }
         await hooks.onComplete?.(report || 'No fare report was returned.')
         controller.close()
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Search failed'
-        await hooks.onFail(message).catch(() => undefined)
-        controller.enqueue(encoder.encode(`\n\nSearch failed: ${message}`))
-        controller.close()
+        await hooks.onFail(message, !started).catch(() => undefined)
+        if (cancelled) return
+        try {
+          controller.enqueue(encoder.encode(`\n\nSearch failed: ${message}`))
+          controller.close()
+        } catch {
+          // the client is already gone; nothing left to report to
+        }
       }
+    },
+    async cancel() {
+      cancelled = true
+      await upstream?.cancel().catch(() => undefined)
     },
   })
 

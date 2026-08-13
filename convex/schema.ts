@@ -18,6 +18,8 @@ export default defineSchema({
     subscriptionInterval: v.optional(v.string()),
     currentPeriodEnd: v.optional(v.number()),
     lifetimeSearchCount: v.number(),
+    writeWindowStart: v.optional(v.number()),
+    writeWindowCount: v.optional(v.number()),
   })
     .index('by_clerkId', ['clerkId'])
     .index('by_stripeCustomerId', ['stripeCustomerId'])

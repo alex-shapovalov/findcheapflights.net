@@ -20,6 +20,12 @@ export function Footer() {
           <Link href="/history" className="hover:text-foam">
             History
           </Link>
+          <Link href="/terms" className="hover:text-foam">
+            Terms
+          </Link>
+          <Link href="/privacy" className="hover:text-foam">
+            Privacy
+          </Link>
         </nav>
       </div>
     </footer>
