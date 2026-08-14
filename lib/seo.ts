@@ -169,6 +169,16 @@ export const HOME_FAQS = [
     answer:
       'Round trip or one way, with optional min/max price, a date window, and a stay length. Origins can expand to airports within about six hours of home.',
   },
+  {
+    question: 'Can I get cheap flights delivered to my email?',
+    answer:
+      'Not yet, but it is coming. Save a hunt and we email you when new cheap inventory shows up, weekly or every other week. You do not have to come back to check. We will also send you similar cheap flights you may be interested in.',
+  },
+  {
+    question: 'Will there be a travel blog tailored to me?',
+    answer:
+      "That's the plan. We want to learn from you and give you a custom personalized blog to help you find the cheap destinations we know you'd love.",
+  },
 ] as const
 
 export function websiteJsonLd() {

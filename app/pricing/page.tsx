@@ -18,9 +18,9 @@ export default function PricingPage() {
         One free cheap-flight hunt. Then 25 a day.
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
-        Every findcheapflights.ai account gets a single live fare search.
-        Subscribe for $11.99/month or $199.99/year to keep hunting — no GDS,
-        just an aggressive model with web search against public fare pages.
+        Every aaccount a free trial to test us out.
+        Subscribe for $11.99/month or $199.99/year to keep hunting; no GDS,
+        just aggresive searching to get you the best deals.
       </p>
       <div className="mt-10">
         <PricingCards />

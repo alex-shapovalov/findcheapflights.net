@@ -41,8 +41,7 @@ export default function HomePage() {
           <span className="block text-gold">Lock-in the best deals.</span>
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-mute">
-          Hunt verified cheap fares from nearby airports or to a destination you
-          already want. We hunt for the trips you didn't know you could take.
+          Hunt verified cheap fares; even if you don't know where you want to go yet. We hunt for the trips you didn't know you could afford, and dig deep to find the deals that you would miss in a normal search.
         </p>
       </section>
       <SearchForm />
