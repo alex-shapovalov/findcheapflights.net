@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Geist, Geist_Mono } from 'next/font/google'
 import { cookies } from 'next/headers'
+import { Analytics } from '@vercel/analytics/next'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
 import { Providers } from '@/components/providers'
@@ -100,6 +101,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
           </main>
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   )
