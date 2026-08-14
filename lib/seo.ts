@@ -6,7 +6,7 @@ import type { StoryEntry } from './story'
 export const SITE_NAME = APP_NAME
 export const SITE_DOMAIN = 'findcheapflights.ai'
 
-export const DEFAULT_TITLE = 'Find Cheap Flights — Hunt Live Cheap Fares'
+export const DEFAULT_TITLE = 'Find Cheap Flights: search live cheap fares'
 export const DEFAULT_DESCRIPTION =
   'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
 
@@ -152,7 +152,7 @@ export const HOME_FAQS = [
   {
     question: 'How is this different from Google Flights?',
     answer:
-      'Google Flights is a timetable, you need to know where you want to go, and when. Instead, we let you be as flexible as possible and find the trip you didn\'t know you could take. Flexible origins, flexible destinations, date windows, night ranges, and a price ceiling.',
+      "Google Flights is a timetable, you need to know where you want to go, and when. Instead, we let you be as flexible as possible and find the trip you didn't know you could take. Flexible origins, flexible destinations, date windows, night ranges, and a price ceiling.",
   },
   {
     question: 'Is there a free cheap-flight search?',

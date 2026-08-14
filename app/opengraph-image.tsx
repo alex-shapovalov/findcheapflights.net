@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Find Cheap Flights — hunt live cheap fares'
+export const alt = 'Find Cheap Flights: search live cheap fares'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
