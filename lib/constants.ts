@@ -14,7 +14,6 @@ export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
   (process.env.NODE_ENV === 'production' ? SITE_URL : 'http://localhost:3000')
 export const OPENROUTER_MODEL = 'google/gemini-3.7-flash'
-export const OPENROUTER_MAX_OUTPUT_TOKENS = 32_000
 
 export const CONTACT_EMAIL = 'support@findcheapflights.ai'
 export const LEGAL_UPDATED = 'August 13, 2026'

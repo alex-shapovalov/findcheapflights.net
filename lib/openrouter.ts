@@ -1,8 +1,4 @@
-import {
-  APP_URL,
-  OPENROUTER_MAX_OUTPUT_TOKENS,
-  OPENROUTER_MODEL,
-} from './constants'
+import { APP_URL, OPENROUTER_MODEL } from './constants'
 import { buildFlightHuntPrompt } from './prompt'
 import { FARE_REPORT_SCHEMA } from './report-schema'
 import type { SearchRequest } from './types'
@@ -51,7 +47,6 @@ function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
       model: OPENROUTER_MODEL,
       stream: true,
       temperature: 0.2,
-      max_tokens: OPENROUTER_MAX_OUTPUT_TOKENS,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: prompt },
