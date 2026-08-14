@@ -127,6 +127,7 @@ function PlanCard({
         <li>Flexible origins or destinations</li>
         <li>Round trip or one way, with price bounds</li>
         <li>Saved search history</li>
+        <li>Cancel anytime</li>
       </ul>
       <div className="mt-auto pt-6">
         {signedIn ? (
