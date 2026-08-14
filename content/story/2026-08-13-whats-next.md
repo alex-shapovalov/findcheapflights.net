@@ -1,10 +1,14 @@
 ---
 title: What's next
 tag: next
-summary: Alerts, watched hunts, and a tighter read on whether a fare is actually bookable.
+summary: Alerts, personalized onboarding, and a tighter read on whether a fare is actually bookable.
 ---
 
 Hi all, we just wanted to make a note about what is planned for the future. Suggestions? Contact us at [support@findcheapflights.ai](mailto:support@findcheapflights.ai).
+
+## Personalized onboarding
+
+We will add a short onboarding so we can learn what you actually like — beaches, cities, food, ski, nightlife — and tailor the flights we hunt to your interests.
 
 ## Cheap flights delivered to your email
 

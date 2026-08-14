@@ -31,7 +31,7 @@ export const PLANS = {
   },
   yearly: {
     name: 'Pro Yearly',
-    amountUsd: 199.99,
+    amountUsd: 119.99,
     interval: 'year' as const,
     searchesPerDay: SUBSCRIBER_DAILY_LIMIT,
   },

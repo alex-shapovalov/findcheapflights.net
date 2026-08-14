@@ -157,7 +157,7 @@ export const HOME_FAQS = [
   {
     question: 'Is there a free cheap-flight search?',
     answer:
-      'Yes. We offer a one-time free search to try us out. After that, sign in and subscribe to Pro for $11.99/month or $199.99/year for 25 searches a day.',
+      'Yes. We offer a one-time free search to try us out. After that, sign in and subscribe to Pro for $11.99/month or $119.99/year for 25 searches a day.',
   },
   {
     question: 'Do you book the ticket?',
@@ -178,6 +178,11 @@ export const HOME_FAQS = [
     question: 'Will there be a travel blog tailored to me?',
     answer:
       "That's the plan. We want to learn from you and give you a custom personalized blog to help you find the cheap destinations we know you'd love.",
+  },
+  {
+    question: 'Will onboarding tailor flights to my interests?',
+    answer:
+      'Yes. We will add a personalized onboarding so we can learn what you like and tailor the flights we hunt to your interests.',
   },
 ] as const
 
@@ -360,7 +365,7 @@ export function pricingJsonLd() {
       {
         '@type': 'Offer',
         name: 'Pro Yearly',
-        price: '199.99',
+        price: '119.99',
         priceCurrency: 'USD',
         url: `${SITE_URL}/pricing`,
         description: '25 live cheap-flight hunts per day',
