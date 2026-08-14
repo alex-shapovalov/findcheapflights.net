@@ -21,7 +21,7 @@ export default function StoryPage() {
         The story
       </h1>
       <p className="mt-4 text-mute">
-        Dated notes as the product changes — what shipped, what we are building
+        Dated notes as the product changes: what shipped, what we are building
         toward. Newest first.
       </p>
       {entries.length === 0 ? (
