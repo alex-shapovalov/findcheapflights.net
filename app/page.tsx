@@ -28,19 +28,15 @@ export default function HomePage() {
       />
       <section className="mb-10 max-w-3xl">
         <p className="text-xs uppercase tracking-[0.28em] text-gold">
-          findcheapflights.net
+          findcheapflights.ai
         </p>
         <h1 className="mt-3 font-display text-4xl leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
           Find cheap flights.
-          <span className="block text-gold">
-            Pack if it&apos;s stupid cheap.
-          </span>
+          <span className="block text-gold">Lock-in the best deals.</span>
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-mute">
-          Hunt live cheap fares from nearby airports or to a destination you
-          already want. Flexible dates, trip type, and a price ceiling — then an
-          aggressive deal hunter reads public fare pages. One free search, then
-          Pro.
+          Hunt verified cheap fares from nearby airports or to a destination you
+          already want. We hunt for the trips you didn't know you could take.
         </p>
       </section>
       <SearchForm />
@@ -59,7 +55,7 @@ export default function HomePage() {
             <p className="font-medium text-foam">2. Set the hunt</p>
             <p className="mt-1">
               Round trip or one way, a date window, stay length, and optional
-              min/max price. Add interests if you want the fare to match a trip
+              min/max price. Pick a theme if you want the fare to match a trip
               you would actually take.
             </p>
           </li>

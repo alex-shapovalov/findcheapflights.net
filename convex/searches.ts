@@ -5,8 +5,8 @@ import {
   consumeWriteBudget,
   MAX_AIRPORTS,
   MAX_ERROR_CHARS,
-  MAX_INTERESTS_CHARS,
   MAX_RESULT_CHARS,
+  MAX_THEME_CHARS,
   requireClerkId,
 } from './guards'
 import { searchMode, tripType } from './schema'
@@ -56,7 +56,7 @@ export const create = mutation({
       destinationAirports: iataCodes(args.destinationAirports),
       continent: args.continent ? boundedString(args.continent, 40) : undefined,
       interests: args.interests
-        ? boundedString(args.interests, MAX_INTERESTS_CHARS)
+        ? boundedString(args.interests, MAX_THEME_CHARS)
         : undefined,
       status: 'running',
     })

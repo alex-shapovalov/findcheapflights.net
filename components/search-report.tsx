@@ -9,6 +9,7 @@ import {
   TriangleAlert,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { safeExternalUrl } from '@/lib/link-guard'
 import {
   type CheckedFare,
   type DealLabel,
@@ -403,8 +404,10 @@ function RawReport({ text, running }: { text: string; running?: boolean }) {
 function linkify(text: string) {
   const parts = text.split(/((?:https?:\/\/|www\.)[^\s)]+)/g)
   return parts.map((part, index) => {
-    if (/^(https?:\/\/|www\.)/.test(part)) {
-      const href = part.startsWith('http') ? part : `https://${part}`
+    const href = safeExternalUrl(
+      part.startsWith('www.') ? `https://${part}` : part,
+    )
+    if (href) {
       return (
         <a
           key={`${part}-${index}`}

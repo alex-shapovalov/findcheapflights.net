@@ -4,8 +4,25 @@ import {
   getAirport,
   nearbyAirports,
 } from './airports'
-import { SEARCH_HORIZON_MONTHS } from './constants'
+import { SEARCH_HORIZON_MONTHS, type TravelThemeId } from './constants'
 import type { SearchRequest } from './types'
+
+const THEME_PROMPTS: Record<TravelThemeId, string> = {
+  electronic:
+    'electronic music, club nights, warehouse parties, and EDM/techno festivals',
+  concerts: 'concerts, arena and stadium tours, and live music festivals',
+  nightlife: 'nightlife, bar districts, and late-night city scenes',
+  cities: 'major cities, architecture, art galleries, and museums',
+  food: 'regional food scenes, markets, wine regions, and vineyard country',
+  beaches: 'beaches, islands, and warm coastal towns',
+  diving: 'scuba diving, snorkeling, reefs, and clear-water coastlines',
+  surf: 'surf breaks and surf towns',
+  ski: 'skiing, snowboarding, and alpine resort towns',
+  hiking: 'hiking, national parks, mountains, and the outdoors',
+  sport: 'live sport — football/soccer matches, motorsport, and major fixtures',
+  markets: 'Christmas markets and winter holiday festivities',
+  wellness: 'spas, thermal baths, and wellness retreats',
+}
 
 function priceLine(minPrice?: number, maxPrice?: number) {
   if (minPrice != null && maxPrice != null) {
@@ -106,8 +123,8 @@ function destinationBlock(input: SearchRequest) {
   ].join(' ')
 }
 
-function interestsBlock(interests?: string) {
-  const text = interests?.trim()
+function interestsBlock(theme?: TravelThemeId) {
+  const text = theme ? THEME_PROMPTS[theme] : undefined
   if (!text) {
     return 'TRAVEL PREFERENCE: No special theme was provided. Optimize for genuinely cheap, high-quality itineraries to compelling destinations. Do not invent a hobby theme.'
   }

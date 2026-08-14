@@ -15,7 +15,7 @@ const SYSTEM_PROMPT =
 export async function streamFlightHunt(input: SearchRequest) {
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
-    throw new Error('OPENROUTER_API_KEY is not configured')
+    throw new Error('Fare search is not configured')
   }
 
   const prompt = buildFlightHuntPrompt(input, new Date())
@@ -24,14 +24,13 @@ export async function streamFlightHunt(input: SearchRequest) {
   if (!response.ok) {
     const detail = await response.text().catch(() => '')
     if (!isSchemaUnsupported(response.status, detail)) {
-      throw new Error(`Request failed (${response.status})`)
+      throw new Error(`Upstream request failed (${response.status})`)
     }
     response = await requestHunt(apiKey, prompt, false)
   }
 
   if (!response.ok || !response.body) {
-    const detail = await response.text().catch(() => '')
-    throw new Error(`Request failed (${response.status})`)
+    throw new Error(`Upstream request failed (${response.status})`)
   }
 
   return response.body

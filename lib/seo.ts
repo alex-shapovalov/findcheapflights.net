@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import { APP_NAME, SITE_URL } from './constants'
 
 export const SITE_NAME = APP_NAME
-export const SITE_DOMAIN = 'findcheapflights.net'
+export const SITE_DOMAIN = 'findcheapflights.ai'
 
 export const DEFAULT_TITLE = 'Find Cheap Flights — Hunt Live Cheap Fares'
 export const DEFAULT_DESCRIPTION =
-  'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.net.'
+  'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
 
 export const TITLE_TEMPLATE = `%s | ${SITE_NAME}`
 
@@ -87,7 +87,7 @@ export function pageMetadata({
 
 export const HOME_FAQS = [
   {
-    question: 'What is findcheapflights.net?',
+    question: 'What is findcheapflights.ai?',
     answer:
       'Find Cheap Flights is a live fare hunter. You pick airports near you and a continent — or lock a destination and let origins flex — then an aggressive model searches public fare pages for stupid-cheap tickets.',
   },

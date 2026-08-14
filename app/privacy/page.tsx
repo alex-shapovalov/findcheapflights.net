@@ -6,7 +6,7 @@ import { pageMetadata } from '@/lib/seo'
 export const metadata = pageMetadata({
   title: 'Privacy Policy',
   description:
-    'What findcheapflights.net collects, why, which providers process it, and how to get your data deleted.',
+    'What findcheapflights.ai collects, why, which providers process it, and how to get your data deleted.',
   path: '/privacy',
 })
 
@@ -26,8 +26,8 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Search data.</strong> The criteria you submit — airports,
-            trip type, date window, stay length, price bounds, interests — plus
-            the report we generate and its status, so you can revisit it in your
+            trip type, date window, stay length, price bounds, theme — plus the
+            report we generate and its status, so you can revisit it in your
             history.
           </li>
           <li>

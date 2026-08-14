@@ -1,4 +1,4 @@
-import type { Continent } from './constants'
+import type { Continent, TravelThemeId } from './constants'
 
 export type SearchMode = 'flexible_destination' | 'flexible_origin'
 export type TripType = 'round_trip' | 'one_way'
@@ -15,7 +15,7 @@ export type SearchRequest = {
   dateTo?: string
   minNights?: number
   maxNights?: number
-  interests?: string
+  interests?: TravelThemeId
 }
 
 export type QuotaState = {

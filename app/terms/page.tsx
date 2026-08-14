@@ -10,7 +10,7 @@ import { pageMetadata } from '@/lib/seo'
 export const metadata = pageMetadata({
   title: 'Terms of Service',
   description:
-    'The terms that govern your use of findcheapflights.net, including plan limits, billing, acceptable use, and fare accuracy disclaimers.',
+    'The terms that govern your use of findcheapflights.ai, including plan limits, billing, acceptable use, and fare accuracy disclaimers.',
   path: '/terms',
 })
 
@@ -19,7 +19,7 @@ export default function TermsPage() {
     <LegalPage
       eyebrow="Legal"
       title="Terms of Service"
-      intro="These terms are a plain-language agreement between you and findcheapflights.net. By using the site you agree to them. If you do not agree, please do not use the site."
+      intro="These terms are a plain-language agreement between you and findcheapflights.ai. By using the site you agree to them. If you do not agree, please do not use the site."
     >
       <LegalSection heading="What the service does">
         <p>

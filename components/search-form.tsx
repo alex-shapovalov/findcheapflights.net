@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from 'react'
 import { SearchReport } from '@/components/search-report'
 import { nearbyAirports } from '@/lib/airports'
 import { cn } from '@/lib/cn'
-import type { Continent } from '@/lib/constants'
+import type { Continent, TravelThemeId } from '@/lib/constants'
 import {
   CONTINENTS,
   FREE_SEARCH_LIMIT,
   SUBSCRIBER_DAILY_LIMIT,
+  TRAVEL_THEMES,
 } from '@/lib/constants'
 import type {
   QuotaState,
@@ -19,14 +20,6 @@ import type {
   TripType,
 } from '@/lib/types'
 import { AirportPicker } from './airport-picker'
-
-const INTEREST_CHIPS = [
-  'Electronic music, raves, clubs, EDM festivals',
-  'Beaches and islands',
-  'Cities, museums, and food',
-  'Ski and mountains',
-  'Nightlife',
-]
 
 const emptyQuota: QuotaState = {
   subscribed: false,
@@ -50,7 +43,7 @@ export function SearchForm() {
   const [dateTo, setDateTo] = useState('')
   const [minNights, setMinNights] = useState('3')
   const [maxNights, setMaxNights] = useState('10')
-  const [interests, setInterests] = useState('')
+  const [theme, setTheme] = useState<TravelThemeId | null>(null)
   const [quota, setQuota] = useState<QuotaState>(emptyQuota)
   const [report, setReport] = useState('')
   const [status, setStatus] = useState<'idle' | 'running' | 'done' | 'error'>(
@@ -124,7 +117,7 @@ export function SearchForm() {
         tripType === 'round_trip' && minNights ? Number(minNights) : undefined,
       maxNights:
         tripType === 'round_trip' && maxNights ? Number(maxNights) : undefined,
-      interests: interests.trim() || undefined,
+      interests: theme ?? undefined,
     }
 
     const response = await fetch('/api/search', {
@@ -327,29 +320,29 @@ export function SearchForm() {
               Make it compelling
             </span>
             <div className="flex flex-wrap gap-2">
-              {INTEREST_CHIPS.map(chip => (
+              {TRAVEL_THEMES.map(item => (
                 <button
-                  key={chip}
+                  key={item.id}
                   type="button"
-                  onClick={() => setInterests(chip)}
+                  aria-pressed={theme === item.id}
+                  onClick={() =>
+                    setTheme(current => (current === item.id ? null : item.id))
+                  }
                   className={cn(
                     'rounded-full border px-3 py-1 text-xs',
-                    interests === chip
+                    theme === item.id
                       ? 'border-gold text-gold'
                       : 'border-line text-mute hover:text-foam',
                   )}
                 >
-                  {chip.split(',')[0]}
+                  {item.label}
                 </button>
               ))}
             </div>
-            <textarea
-              value={interests}
-              onChange={event => setInterests(event.target.value)}
-              rows={3}
-              placeholder="Optional: festivals, cities, food, ski, nightlife..."
-              className="w-full rounded-xl border border-line bg-panel-2 px-3 py-3 text-sm outline-none placeholder:text-mute"
-            />
+            <p className="text-xs text-mute">
+              Optional. Pick one to weight destinations and dates toward a
+              theme.
+            </p>
           </div>
         </div>
 

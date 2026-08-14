@@ -4,6 +4,7 @@ import { useQuery } from 'convex/react'
 import Link from 'next/link'
 import { api } from '@/convex/_generated/api'
 import type { Doc } from '@/convex/_generated/dataModel'
+import { travelThemeLabel } from '@/lib/constants'
 
 export default function HistoryPage() {
   const searches = useQuery(api.searches.listMine)
@@ -19,29 +20,32 @@ export default function HistoryPage() {
         {searches?.length === 0 && (
           <p className="text-mute">No searches yet.</p>
         )}
-        {searches?.map((search: Doc<'searches'>) => (
-          <Link
-            key={search._id}
-            href={`/history/${search._id}`}
-            className="block rounded-2xl border border-line bg-panel px-4 py-4 hover:border-gold"
-          >
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="wrap-break-word font-medium">
-                {search.mode === 'flexible_destination'
-                  ? `${search.originAirports.join(', ')} → ${search.continent}`
-                  : `${search.originAirports.join(', ')} → ${search.destinationAirports.join(', ')}`}
+        {searches?.map((search: Doc<'searches'>) => {
+          const themeLabel = travelThemeLabel(search.interests)
+          return (
+            <Link
+              key={search._id}
+              href={`/history/${search._id}`}
+              className="block rounded-2xl border border-line bg-panel px-4 py-4 hover:border-gold"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="wrap-break-word font-medium">
+                  {search.mode === 'flexible_destination'
+                    ? `${search.originAirports.join(', ')} → ${search.continent}`
+                    : `${search.originAirports.join(', ')} → ${search.destinationAirports.join(', ')}`}
+                </p>
+                <span className="text-xs uppercase tracking-[0.16em] text-mute">
+                  {search.status}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-mute">
+                {search.tripType.replace('_', ' ')}
+                {search.maxPrice != null ? ` · max $${search.maxPrice}` : ''}
+                {themeLabel ? ` · ${themeLabel}` : ''}
               </p>
-              <span className="text-xs uppercase tracking-[0.16em] text-mute">
-                {search.status}
-              </span>
-            </div>
-            <p className="mt-1 text-sm text-mute">
-              {search.tripType.replace('_', ' ')}
-              {search.maxPrice != null ? ` · max $${search.maxPrice}` : ''}
-              {search.interests ? ` · ${search.interests}` : ''}
-            </p>
-          </Link>
-        ))}
+            </Link>
+          )
+        })}
       </div>
     </div>
   )

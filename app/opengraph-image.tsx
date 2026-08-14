@@ -29,7 +29,7 @@ export default function OpenGraphImage() {
           textTransform: 'uppercase',
         }}
       >
-        findcheapflights.net
+        findcheapflights.ai
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div
@@ -43,7 +43,7 @@ export default function OpenGraphImage() {
           Find cheap flights.
         </div>
         <div style={{ fontSize: 42, color: '#e8b84a' }}>
-          Pack if it's stupid cheap.
+          Lock-in the best deals.
         </div>
       </div>
       <div style={{ fontSize: 24, color: '#8aa0b2' }}>

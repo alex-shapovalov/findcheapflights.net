@@ -21,8 +21,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/:path*',
-        has: [{ type: 'host', value: 'www.findcheapflights.net' }],
-        destination: 'https://findcheapflights.net/:path*',
+        has: [{ type: 'host', value: 'www.findcheapflights.ai' }],
+        destination: 'https://findcheapflights.ai/:path*',
         permanent: true,
       },
     ]

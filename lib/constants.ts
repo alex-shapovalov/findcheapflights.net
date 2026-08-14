@@ -9,14 +9,14 @@ export const QUOTA_IP_BURST_LIMIT = 60
 export const NEARBY_RADIUS_KM = 560
 export const SEARCH_HORIZON_MONTHS = 24
 export const APP_NAME = 'Find Cheap Flights'
-export const SITE_URL = 'https://findcheapflights.net'
+export const SITE_URL = 'https://findcheapflights.ai'
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ??
   (process.env.NODE_ENV === 'production' ? SITE_URL : 'http://localhost:3000')
 export const OPENROUTER_MODEL = 'google/gemini-3.7-flash'
 export const OPENROUTER_MAX_OUTPUT_TOKENS = 32_000
 
-export const CONTACT_EMAIL = 'support@findcheapflights.net'
+export const CONTACT_EMAIL = 'support@findcheapflights.ai'
 export const LEGAL_UPDATED = 'August 13, 2026'
 
 export const SIGN_IN_PATH = '/sign-in'
@@ -48,3 +48,29 @@ export const CONTINENTS = [
 ] as const
 
 export type Continent = (typeof CONTINENTS)[number]
+
+export const TRAVEL_THEMES = [
+  { id: 'electronic', label: 'Electronic & clubs' },
+  { id: 'concerts', label: 'Concerts & live music' },
+  { id: 'nightlife', label: 'Nightlife & bars' },
+  { id: 'cities', label: 'Cities, art & museums' },
+  { id: 'food', label: 'Food & wine' },
+  { id: 'beaches', label: 'Beaches & islands' },
+  { id: 'diving', label: 'Diving & snorkeling' },
+  { id: 'surf', label: 'Surf' },
+  { id: 'ski', label: 'Ski & snowboard' },
+  { id: 'hiking', label: 'Hiking & national parks' },
+  { id: 'sport', label: 'Live sport' },
+  { id: 'markets', label: 'Christmas markets' },
+  { id: 'wellness', label: 'Spas & wellness' },
+] as const
+
+export type TravelThemeId = (typeof TRAVEL_THEMES)[number]['id']
+
+export function isTravelThemeId(value: unknown): value is TravelThemeId {
+  return TRAVEL_THEMES.some(theme => theme.id === value)
+}
+
+export function travelThemeLabel(value: string | undefined) {
+  return TRAVEL_THEMES.find(theme => theme.id === value)?.label
+}

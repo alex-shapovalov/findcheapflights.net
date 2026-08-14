@@ -1,4 +1,5 @@
 import { getAirport, searchAirports } from './airports'
+import { safeExternalUrl } from './link-guard'
 import type { TripType } from './types'
 
 export const DEAL_RATINGS = [
@@ -282,8 +283,7 @@ function asBoolean(value: unknown) {
 }
 
 function asUrl(value: unknown) {
-  const text = asText(value)
-  return text && /^https?:\/\//i.test(text) ? text : undefined
+  return safeExternalUrl(asText(value))
 }
 
 function asTextList(value: unknown) {

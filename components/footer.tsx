@@ -6,7 +6,7 @@ export function Footer() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-mute sm:flex-row sm:items-center sm:justify-between">
         <p>
           <Link href="/" className="hover:text-foam">
-            findcheapflights.net
+            findcheapflights.ai
           </Link>{' '}
           — find cheap flights with flexible-date fare hunting, not a GDS.
         </p>

@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   keywords: [
     'find cheap flights',
     'cheap flights',
-    'findcheapflights.net',
+    'findcheapflights.ai',
     'flexible date flights',
     'nearby airport deals',
     'fare hunter',

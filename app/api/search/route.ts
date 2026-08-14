@@ -39,6 +39,19 @@ function tooManyRequests(message: string) {
   return Response.json({ error: 'rate_limited', message }, { status: 429 })
 }
 
+const GENERIC_SEARCH_ERROR =
+  'Something went wrong running this search. Please try again.'
+const TIMEOUT_SEARCH_ERROR =
+  'This search ran too long and stopped before a report came back. Please try again.'
+
+function publicSearchError(error: unknown) {
+  const name = error instanceof Error ? error.name : ''
+  if (name === 'TimeoutError' || name === 'AbortError') {
+    return TIMEOUT_SEARCH_ERROR
+  }
+  return GENERIC_SEARCH_ERROR
+}
+
 export async function POST(request: Request) {
   if (!isTrustedOrigin(request)) {
     return Response.json({ error: 'Invalid origin.' }, { status: 403 })
@@ -178,11 +191,12 @@ function huntResponse(
         await hooks.onComplete?.(report || 'No fare report was returned.')
         controller.close()
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Search failed'
+        console.error('Fare hunt failed', error)
+        const message = publicSearchError(error)
         await hooks.onFail(message, !started).catch(() => undefined)
         if (cancelled) return
         try {
-          controller.enqueue(encoder.encode(`\n\nSearch failed: ${message}`))
+          controller.enqueue(encoder.encode(`\n\n${message}`))
           controller.close()
         } catch {
           // the client is already gone; nothing left to report to

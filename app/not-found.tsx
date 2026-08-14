@@ -5,7 +5,7 @@ import { noIndexMetadata } from '@/lib/seo'
 export const metadata: Metadata = {
   ...noIndexMetadata,
   title: 'Page not found',
-  description: 'This page does not exist on findcheapflights.net.',
+  description: 'This page does not exist on findcheapflights.ai.',
 }
 
 export default function NotFound() {

@@ -1,4 +1,4 @@
-import { CONTINENTS } from './constants'
+import { CONTINENTS, isTravelThemeId } from './constants'
 import type { SearchMode, SearchRequest, TripType } from './types'
 
 const IATA = /^[A-Z]{3}$/
@@ -50,10 +50,7 @@ export function parseSearchRequest(body: unknown): SearchRequest {
     dateTo: optionalDate(input.dateTo, 'end date'),
     minNights: optionalNumber(input.minNights, 'min nights'),
     maxNights: optionalNumber(input.maxNights, 'max nights'),
-    interests:
-      typeof input.interests === 'string'
-        ? input.interests.trim().slice(0, 500)
-        : undefined,
+    interests: isTravelThemeId(input.interests) ? input.interests : undefined,
   }
 }
 

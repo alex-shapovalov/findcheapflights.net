@@ -4,7 +4,7 @@ import type { MutationCtx, QueryCtx } from './_generated/server'
 
 export const MAX_RESULT_CHARS = 60_000
 export const MAX_ERROR_CHARS = 2_000
-export const MAX_INTERESTS_CHARS = 500
+export const MAX_THEME_CHARS = 40
 export const MAX_AIRPORTS = 12
 
 export const WRITE_BUDGET = 60
