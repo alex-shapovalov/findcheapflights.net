@@ -22,7 +22,7 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const results = useMemo(() => searchAirports(query, 8), [query])
-  const inputId = `airport-${label.replace(/\s+/g, '-').toLowerCase()}`
+  const inputId = `code-search-${label.replace(/\s+/g, '-').toLowerCase()}`
   const selected = values
     .map(code => getAirport(code))
     .filter((airport): airport is Airport => Boolean(airport))
@@ -68,19 +68,36 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
           ))}
           <input
             id={inputId}
+            type="search"
+            name={`${inputId}-query`}
             value={query}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={open}
+            aria-controls={`${inputId}-listbox`}
+            data-1p-ignore=""
+            data-lpignore="true"
+            data-form-type="other"
             onChange={event => {
               setQuery(event.target.value)
               setOpen(true)
             }}
             onFocus={() => setOpen(true)}
             placeholder={placeholder ?? 'Search city or IATA'}
-            className="min-w-0 flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-mute"
+            className="min-w-0 flex-1 bg-transparent py-1 text-sm outline-none placeholder:text-mute [&::-webkit-search-cancel-button]:hidden"
           />
         </div>
       </div>
       {open && (
-        <ul className="max-h-60 overflow-auto rounded-xl border border-line bg-panel shadow-xl">
+        <ul
+          id={`${inputId}-listbox`}
+          role="listbox"
+          className="max-h-60 overflow-auto rounded-xl border border-line bg-panel shadow-xl"
+        >
           {results.length === 0 ? (
             <li className="px-3 py-2 text-sm text-mute">
               No matching airports

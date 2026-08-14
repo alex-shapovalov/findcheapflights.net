@@ -1,12 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { noIndexMetadata } from '@/lib/seo'
+import { notFoundMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  ...noIndexMetadata,
-  title: 'Page not found',
-  description: 'This page does not exist on findcheapflights.ai.',
-}
+export const metadata: Metadata = notFoundMetadata
 
 export default function NotFound() {
   return (

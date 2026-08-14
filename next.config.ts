@@ -17,6 +17,9 @@ const csp = [
 
 const nextConfig: NextConfig = {
   trailingSlash: false,
+  outputFileTracingIncludes: {
+    '/*': ['./content/story/**/*.md', './content/blog/**/*.md'],
+  },
   async redirects() {
     return [
       {

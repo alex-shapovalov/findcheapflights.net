@@ -176,6 +176,10 @@ export function buildFlightHuntPrompt(input: SearchRequest, now: Date) {
 
   return `Act as an aggressive flexible-date airfare deal hunter for spontaneous leisure trips. Search current ${tripLabel} ${cabin} fares using live/publicly accessible flight-search and airline information whenever possible. Today is ${today}.
 
+HARD URL LAW: Every deal must include a bookingUrl. Prefer a copied Google /booking?tfs=&tfu= or Skyscanner /config/ href. If you do not have that token, emit a dated Google, Kayak, or Skyscanner URL that contains THIS origin IATA, destination IATA, and travel dates. Never a marketing page. Never null.
+
+VISIT AND CONFIRM: Before you emit a deal, you MUST open bookingUrl with the page-fetch tool and read what is actually on that page. Report only what you saw there — origin, destination, dates, airlines, stops, and price. If the live page shows a different fare, change the deal to match the page or drop it. If the fetch fails, the page is a shell, or you cannot see this itinerary and price, set verifiedLive false and say so in warnings or limitations. verifiedLive is true only after that fetch confirmed this exact fare. Do not mark verified from a snippet, a memory, or a URL you did not open.
+
 ${originBlock(input)}
 
 ${interestsBlock(input.interests)}
@@ -190,17 +194,34 @@ DEAL THRESHOLDS: ${priceLine(input.minPrice, input.maxPrice)}
 
 ITINERARY QUALITY: One-stop protected itineraries are the default hunt, not a fallback. Most of the cheapest transatlantic and leisure fares connect once (Norse, PLAY, Icelandair, French Bee, TAP, Aer Lingus, Air Europa, and similar). Search 1-stop first, then nonstop, then 2-stop when it is materially cheaper. Never hide a cheap 1-stop because a nonstop exists at a higher fare. Economy/basic economy is acceptable but label basic economy and meaningful baggage restrictions. Clearly flag self-transfers, separate tickets, airport changes, overnight layovers, or risky connections. Do not recommend an absurd itinerary to save a trivial amount.
 
-CHEAPEST-ON-PAGE RULE: priceUsd must be the cheapest qualifying ${tripLabel} fare on the exact page you put in bookingUrl. If a traveler opens that same href and sees a lower ${tripLabel} price than priceUsd, the report is wrong; replace the deal with that cheaper fare. Do not pick a convenient mid-list itinerary when a cheaper 1-stop sits above it.
+CHEAPEST-ON-PAGE RULE: You must have fetched bookingUrl in this run. That page must show this origin, destination, and dates. If it is a results grid, priceUsd must be a fare you actually saw there for this itinerary — not a different cheapest row. Prefer a Select/Book/config href when you can copy one. Do not pick a convenient mid-list itinerary when a cheaper 1-stop sits above it.
 
 SOURCES: Fetch these Skyscanner pages first with the page-fetch tool, before Google Flights or Expedia:
 ${fetchUrls}
-Those listings (especially the routes / cheap-flights HTML pages) contain the "from £/$" cards. They are often GBP or EUR — convert to USD. A "from £153" card is usually one-way; the same page often states a return-from price in the header. For a round-trip hunt, do not discard those cards: take the cheap outbound date, add a return in the requested night range, fetch the round-trip result sorted by cheapest, and report that total. Interactive Skyscanner/Expedia day views are JS-heavy and often hide the cheap inventory from a raw fetch — do not stop at the first Expedia "Best" result. After the Skyscanner listing, corroborate with Kayak, Momondo, Google Flights, and the airline.
+Those listings (especially the routes / cheap-flights HTML pages) contain the "from £/$" cards. They are often GBP or EUR — convert to USD. A "from £153" card is usually one-way; the same page often states a return-from price in the header. For a round-trip hunt, do not discard those cards: take the cheap outbound date, add a return in the requested night range, fetch the dated round-trip result, and if a Select/Book/config href is visible, copy that. Otherwise bookingUrl is the dated search URL for those exact airports and dates. Interactive Skyscanner/Expedia day views are JS-heavy and often hide the cheap inventory from a raw fetch — do not stop at the first Expedia "Best" result. After the Skyscanner listing, corroborate with Kayak, Momondo, Google Flights, and the airline.
 
 SEARCH STRATEGY: On each run, maximize useful coverage rather than repeating one generic query. Search origin/destination pairs independently, including 1-stop connecting cities, not just nonstop. Look for current fare pages, flexible-date fare results, airline sales, recently surfaced deal pricing, reputable flight-search results, and relevant current event calendars/official event sources when event timing could add value. When possible verify promising fares through a current flight-search result rather than stale snippets. Pay special attention to shoulder season, midweek departures, newly released inventory, short-notice drops, cheap connection combinations, event weekends, festival dates, and fares far below route norms. For year-round destinations, deliberately inspect off-season months. If a broad query reveals a promising fare or event/date pairing, drill into it before reporting. Use flexible-date calendars/date grids/price graphs when accessible; vary departure dates, return dates, trip lengths, and origin airports; search multiple targeted date windows rather than relying on a single broad web query. Never claim exhaustive coverage unless every combination was actually checked. If Skyscanner shows a cluster of sub-£300 / sub-$400 1-stops and you are about to report $600+ only, you missed the cheap inventory — go back and price those dates as ${tripLabel} before finishing.
 
 Do not fabricate live availability, fares, event dates, lineups, airport codes, or URLs. If a source is stale, say so. Always be transparent about search coverage and limitations. Do not imply access to a private Google Flights/GDS API if none exists.
 
-LINK RULE: bookingUrl and sourceUrl must be copied verbatim from a page or search result you actually opened in this run — the exact href of that fare, including dates, itinerary ids, and query string. Never invent a URL, never rewrite one, and never substitute a generic search (for example a city-to-city browse page, a homepage, or a reconstructed Skyscanner/Expedia/Google Flights search you did not fetch). If you did not observe a real href for that fare, set the field to null. A traveler must land on the same result you priced, not a fresh search.
+FARE URL CONTRACT: bookingUrl is required. Best is a copied post-select href. Good enough is a dated search for THIS itinerary. Null is wrong.
+
+BEST (copy, do not invent ids):
+- https://www.google.com/travel/flights/booking?tfs=...&tfu=...
+- https://www.skyscanner.com/transport/flights/mco/yeaa/261113/config/13933-2611130850--32385-1-18102-2611131655?...
+
+GOOD ENOUGH (always emit one of these if you lack a token):
+- https://www.google.com/travel/flights?q=Flights%20from%20CLT%20to%20LHR%20on%202026-10-14%20through%202026-10-21%20American%20Airlines%201%20stop
+- https://www.kayak.com/flights/CLT-LHR/2026-10-14/2026-10-21
+- https://www.skyscanner.com/transport/flights/clt/lhr/261014/261021/
+
+INVALID (never):
+- https://www.cheapflights.com/flights-to-europe/atlanta/
+- https://www.priceline.com/flight-routes/en-us/ATL/ZZEU00/flights-from-atlanta-to-europe.ssp
+- https://flynorse.com/en-US/flights-from-New-York-to-Rome
+- any /flights-from-*, /flights-to-*, /flight-routes/*, continent, or date-less browse page
+
+sourceUrl may be the page where you first saw the price.
 
 ALERT POLICY: Always return deals. Rank 6-8 of the closest currently bookable fares, cheapest first. Prefer fares under the traveler's cap when they exist. If the cap cannot be met, still put the nearest live prices in deals, set aboveRequestedCap, and say they missed the target. Expired blog posts, stale 2025 pages, and recaps go in alsoChecked, not deals. Never write a report whose conclusion is that there is nothing to show.
 
@@ -221,9 +242,9 @@ Field meanings:
 - deals[].warnings: self-transfers, separate tickets, airport changes, overnight layovers, risky connections, or pricing you could not confirm.
 - deals[].rating: INTERESTING, GOOD, VERY_GOOD, EXCELLENT, EXCEPTIONAL, or EXTREME.
 - deals[].labels: add CHEAPEST_OVERALL and BEST_VALUE when several deals qualify, and EVENT_JACKPOT when a strong fare lands on an unusually compelling relevant event.
-- deals[].bookingUrl: the exact URL of this fare as copied from the page or tool result. Must include the dates and itinerary you are reporting. Null if you have no observed href. Never a generic origin-destination search you constructed.
-- deals[].sourceUrl: the exact URL of the page where you saw the price, copied verbatim. Same no-invention rule.
-- deals[].verifiedLive: true only when the price was confirmed on a live fare search page during this run and bookingUrl is that page's exact href.
+- deals[].bookingUrl: required. Prefer a copied Google /booking?tfs=&tfu= or Skyscanner /config/ href. Otherwise a dated Google/Kayak/Skyscanner URL for THIS origin, destination, and dates. You must fetch this href before reporting. Never null. Never a marketing page.
+- deals[].sourceUrl: page where you saw the price, or null. Never a marketing page.
+- deals[].verifiedLive: true only after you fetched bookingUrl in this run and saw this origin, destination, dates, and price on that page. False if you did not open it or the page did not show this fare.
 - deals[].event: the overlapping event with dates and an official source, or null. Set separateTicket when the event needs its own ticket.
 - alsoChecked: expired recaps, stale pages, and routes that were not close enough to list as deals.
 - recommendations: concrete next steps, such as price alerts or months to revisit.
@@ -231,6 +252,6 @@ Field meanings:
 
 The goal is to find fares cheap enough to plausibly justify an otherwise unplanned spontaneous trip, while still applying intelligent destination-specific seasonality and itinerary quality. Never hallucinate facts, prices, dates, or links.
 
-AGAIN: ALWAYS REMEMBER TO FOLLOW THE JSON SCHEMA, OTHERWISE YOU WILL BREAK THE INPUT/OUTPUT CONTRACT AND CAUSE A CRASH.
+AGAIN: fetch every bookingUrl and report what that page actually showed. Never mark verifiedLive without that visit. ALWAYS FOLLOW THE JSON SCHEMA OR THE CONTRACT BREAKS.
 `
 }

@@ -25,13 +25,13 @@ export const AFTER_AUTH_PATH = '/'
 export const PLANS = {
   monthly: {
     name: 'Pro Monthly',
-    amountUsd: 5,
+    amountUsd: 11.99,
     interval: 'month' as const,
     searchesPerDay: SUBSCRIBER_DAILY_LIMIT,
   },
   yearly: {
     name: 'Pro Yearly',
-    amountUsd: 50,
+    amountUsd: 199.99,
     interval: 'year' as const,
     searchesPerDay: SUBSCRIBER_DAILY_LIMIT,
   },

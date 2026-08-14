@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import { JsonLd } from '@/components/json-ld'
 import { SearchForm } from '@/components/search-form'
+import { formatBlogDate, getBlogPosts } from '@/lib/blog'
 import {
   DEFAULT_DESCRIPTION,
   faqJsonLd,
@@ -9,6 +11,7 @@ import {
   softwareJsonLd,
   websiteJsonLd,
 } from '@/lib/seo'
+import { formatStoryDate, getStoryEntries, storyTagLabel } from '@/lib/story'
 
 export const metadata = pageMetadata({
   description: DEFAULT_DESCRIPTION,
@@ -16,6 +19,9 @@ export const metadata = pageMetadata({
 })
 
 export default function HomePage() {
+  const latestStory = getStoryEntries().slice(0, 2)
+  const latestPosts = getBlogPosts().slice(0, 3)
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <JsonLd
@@ -46,9 +52,8 @@ export default function HomePage() {
           <li>
             <p className="font-medium text-foam">1. Pick airports</p>
             <p className="mt-1">
-              Start from airports near you and a continent — destination stays
-              variable — or lock a city and let origins flex within about six
-              hours of home.
+              Start from airports near you and a continent, destination stays
+              variable; or lock a destination and let origins remain flexible.
             </p>
           </li>
           <li>
@@ -56,21 +61,21 @@ export default function HomePage() {
             <p className="mt-1">
               Round trip or one way, a date window, stay length, and optional
               min/max price. Pick a theme if you want the fare to match a trip
-              you would actually take.
+              you would actually take. We let you be as flexible as possible.
             </p>
           </li>
           <li>
             <p className="font-medium text-foam">3. Read live public fares</p>
             <p className="mt-1">
-              We do not sit on a GDS. A deal-seeking model searches live public
-              fare pages and writes a report you can book yourself.
+              We do not sit on a GDS. We search live public
+              fare pages and write a report so you can book yourself.
             </p>
           </li>
         </ol>
       </section>
       <section className="mt-16 max-w-3xl">
         <h2 className="font-display text-3xl tracking-tight">
-          Cheap flight hunting, answered
+          Searching for cheap flights, answered
         </h2>
         <dl className="mt-6 space-y-6">
           {HOME_FAQS.map(item => (

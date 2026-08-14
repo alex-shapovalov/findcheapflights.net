@@ -65,7 +65,7 @@ export default function TermsPage() {
             is also limited per IP address per day to prevent abuse.
           </li>
           <li>
-            Pro is $5 per month or $50 per year and includes up to{' '}
+            Pro is $11.99 per month or $199.99 per year and includes up to{' '}
             {SUBSCRIBER_DAILY_LIMIT} live searches per day. Daily limits reset
             at 00:00 UTC and unused searches do not roll over.
           </li>

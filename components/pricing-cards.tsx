@@ -44,7 +44,7 @@ export function PricingCards() {
       <div className="grid gap-5 md:grid-cols-2">
         <PlanCard
           name={PLANS.monthly.name}
-          price="$5"
+          price={`$${PLANS.monthly.amountUsd}`}
           cadence="per month"
           cta={busy === 'month' ? 'Redirecting...' : 'Start monthly'}
           featured={false}
@@ -53,9 +53,8 @@ export function PricingCards() {
         />
         <PlanCard
           name={PLANS.yearly.name}
-          price="$50"
+          price={`$${PLANS.yearly.amountUsd}`}
           cadence="per year"
-          note="Two months free"
           cta={busy === 'year' ? 'Redirecting...' : 'Start yearly'}
           featured
           signedIn={Boolean(isSignedIn)}

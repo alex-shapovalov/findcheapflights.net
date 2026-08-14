@@ -139,17 +139,17 @@ const dealSchema = {
     bookingUrl: {
       ...stringOrNull,
       description:
-        'Exact href of this fare copied from a page or tool result in this run. Must include the dates/itinerary priced. Never a constructed generic search. Null if no href was observed.',
+        'Required. Prefer a copied Google /travel/flights/booking?tfs=&tfu= or Skyscanner /config/{id} href. Otherwise a dated Google/Kayak/Skyscanner URL for this origin, destination, and dates. Must be fetched in this run before reporting. Never a marketing page. Never null when airports and dates are known.',
     },
     sourceUrl: {
       ...stringOrNull,
       description:
-        'Exact href of the page where the price was seen, copied verbatim. Never invented.',
+        'Page where the fare was found, or null. Never a marketing or continent browse page.',
     },
     verifiedLive: {
       ...booleanOrNull,
       description:
-        'True only when the price was confirmed on a live page whose exact href is bookingUrl.',
+        'True only after bookingUrl was fetched in this run and that page showed this origin, destination, dates, and price.',
     },
     event: eventSchema,
   },

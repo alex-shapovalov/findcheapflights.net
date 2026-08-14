@@ -12,6 +12,8 @@ import { ThemeToggle } from './theme-toggle'
 
 const links = [
   { href: '/', label: 'Hunt' },
+  { href: '/story', label: 'Story' },
+  { href: '/blog', label: 'Blog' },
   { href: '/history', label: 'History' },
   { href: '/pricing', label: 'Pricing' },
 ]
@@ -57,7 +59,7 @@ export function Header() {
               key={link.href}
               href={link.href}
               label={link.label}
-              active={pathname === link.href}
+              active={isActive(pathname, link.href)}
             />
           ))}
         </nav>
@@ -98,7 +100,7 @@ export function Header() {
                 key={link.href}
                 href={link.href}
                 label={link.label}
-                active={pathname === link.href}
+                active={isActive(pathname, link.href)}
                 className="rounded-lg px-3 py-2.5 text-base"
               />
             ))}
@@ -107,6 +109,11 @@ export function Header() {
       )}
     </header>
   )
+}
+
+function isActive(pathname: string, href: string) {
+  if (href === '/') return pathname === '/'
+  return pathname === href || pathname.startsWith(`${href}/`)
 }
 
 function NavLink({

@@ -5,7 +5,7 @@ import { pageMetadata, pricingJsonLd } from '@/lib/seo'
 export const metadata = pageMetadata({
   title: 'Pricing',
   description:
-    'Find cheap flights with one free hunt, then Pro for $5/month or $50/year. 25 live fare searches a day on findcheapflights.ai.',
+    'Find cheap flights with one free hunt, then Pro for $11.99/month or $199.99/year. 25 live fare searches a day on findcheapflights.ai.',
   path: '/pricing',
 })
 
@@ -19,8 +19,8 @@ export default function PricingPage() {
       </h1>
       <p className="mt-4 max-w-2xl text-mute">
         Every findcheapflights.ai account gets a single live fare search.
-        Subscribe for $5/month or $50/year to keep hunting — no GDS, just an
-        aggressive model with web search against public fare pages.
+        Subscribe for $11.99/month or $199.99/year to keep hunting — no GDS,
+        just an aggressive model with web search against public fare pages.
       </p>
       <div className="mt-10">
         <PricingCards />

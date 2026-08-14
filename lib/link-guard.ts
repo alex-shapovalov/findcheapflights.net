@@ -145,3 +145,146 @@ export function safeExternalUrl(value: string | undefined) {
   if (parsed.username || parsed.password) return undefined
   return isAllowedHost(parsed.hostname) ? value : undefined
 }
+
+const MARKETING_PATH =
+  /flights-from-[a-z]|flights-to-[a-z]|flight-routes|\/destinations\/|\/explore\/|\/inspire\/|\/anywhere\/|transport\/flights-from\//i
+
+const REGION_PATH =
+  /(?:^|\/)(?:europe|asia|africa|oceania|worldwide|international|south-america|north-america|anywhere)(?:\/|$|\.)|\/zz[a-z]{2}/i
+
+export function isMarketingBrowseUrl(value: string) {
+  try {
+    const parsed = new URL(value)
+    const path = parsed.pathname
+    if (MARKETING_PATH.test(path)) return true
+    if (REGION_PATH.test(path)) return true
+    if (/\/routes\/[a-z0-9]{3}\/[a-z0-9]{3}\/?$/i.test(path)) return true
+    if (
+      /\/transport\/flights\/[a-z]{3}\/(?:anywhere|[a-z]{3})\/?$/i.test(path)
+    ) {
+      return true
+    }
+    if (/\/flights\/[a-z]{3}-[a-z]{3}\/?$/i.test(path)) return true
+    if (/\/travel\/flights\/?$/i.test(path) && !parsed.search && !parsed.hash) {
+      return true
+    }
+    return false
+  } catch {
+    return true
+  }
+}
+
+export function isGenericBrowseUrl(value: string) {
+  return isMarketingBrowseUrl(value)
+}
+
+export function isSelectedFareUrl(value: string) {
+  try {
+    const parsed = new URL(value)
+    if (isMarketingBrowseUrl(value)) return false
+    const path = parsed.pathname.toLowerCase()
+    const host = parsed.hostname.toLowerCase()
+    const query = parsed.search.toLowerCase()
+
+    if (host.includes('google.') || host === 'flights.google.com') {
+      return (
+        path.includes('/travel/flights/booking') ||
+        parsed.searchParams.has('tfu')
+      )
+    }
+
+    if (host.includes('skyscanner.')) {
+      return /\/config\/[a-z0-9-]+/i.test(path)
+    }
+
+    if (/kayak\.|momondo\.|cheapflights\./.test(host)) {
+      if (/\/book\b|\/checkout|\/pass\b/.test(path)) return true
+      return /\/flights\/[a-z]{3}-[a-z]{3}\/\d{4}-\d{2}-\d{2}(?:\/\d{4}-\d{2}-\d{2})?\/[a-z0-9]{6,}/i.test(
+        path,
+      )
+    }
+
+    if (/expedia\.|orbitz\.|travelocity\./.test(host)) {
+      return /flight-information|checkout|tripid|offerid/i.test(
+        `${path}${query}`,
+      )
+    }
+
+    if (host.includes('priceline.')) {
+      return /\/book|\/checkout|itinerary|offer/i.test(`${path}${query}`)
+    }
+
+    if (/\/(checkout|itinerary|config|cart|purchase|order)\b/i.test(path)) {
+      return true
+    }
+
+    const keys = [...parsed.searchParams.keys()].join(',')
+    return (
+      /(itinerary|offerid|offer_id|resultid|flightkey|bookingid|tfu)/i.test(
+        keys,
+      ) && parsed.search.length > 40
+    )
+  } catch {
+    return false
+  }
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+const DATE_IN_URL =
+  /(?:19|20)\d{2}[-/.]\d{1,2}[-/.]\d{1,2}|(?:19|20)\d{6}|\/\d{6}(?=\/|$)/
+
+export function isDatedItineraryUrl(value: string) {
+  try {
+    if (isMarketingBrowseUrl(value)) return false
+    if (isSelectedFareUrl(value)) return true
+    const parsed = new URL(value)
+    const hay = `${parsed.pathname}${parsed.search}${parsed.hash}`
+    if (DATE_IN_URL.test(hay)) return true
+    return parsed.searchParams.has('tfs') || parsed.searchParams.has('q')
+  } catch {
+    return false
+  }
+}
+
+export function safeFareUrl(value: string | undefined) {
+  const url = safeExternalUrl(value)
+  if (!url || isMarketingBrowseUrl(url)) return undefined
+  return url
+}
+
+export function safeBookingUrl(value: string | undefined) {
+  const url = safeFareUrl(value)
+  if (!url || !isDatedItineraryUrl(url)) return undefined
+  return url
+}
+
+export function itinerarySearchUrl(input: {
+  originAirport?: string
+  destinationAirport?: string
+  departDate?: string
+  returnDate?: string | null
+  airlines?: string[]
+  stops?: number | null
+}) {
+  const origin = input.originAirport?.toUpperCase()
+  const dest = input.destinationAirport?.toUpperCase()
+  const depart = input.departDate
+  if (!origin || !dest || !depart || !ISO_DATE.test(depart)) return undefined
+  const ret = input.returnDate ?? undefined
+  if (ret && !ISO_DATE.test(ret)) return undefined
+
+  const query = [
+    input.returnDate ? '' : 'One way',
+    `Flights from ${origin} to ${dest} on ${depart}`,
+    ret ? `through ${ret}` : '',
+    ...(input.airlines ?? []).filter(Boolean),
+    input.stops === 0 ? 'nonstop' : '',
+    input.stops === 1 ? '1 stop' : '',
+    input.stops != null && input.stops >= 2 ? `${input.stops} stops` : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return `https://www.google.com/travel/flights?hl=en-US&curr=USD&q=${encodeURIComponent(query)}`
+}

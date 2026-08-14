@@ -1,5 +1,10 @@
 import { getAirport, searchAirports } from './airports'
-import { safeExternalUrl } from './link-guard'
+import {
+  itinerarySearchUrl,
+  safeBookingUrl,
+  safeExternalUrl,
+  safeFareUrl,
+} from './link-guard'
 import type { TripType } from './types'
 
 export const DEAL_RATINGS = [
@@ -202,6 +207,25 @@ function normalizeDeal(raw: Record<string, unknown>): Partial<FareDeal> {
     asText(raw.destinationCity) ??
     asText(raw.city) ??
     (destinationAirport ? getAirport(destinationAirport)?.city : undefined)
+  const departDate = asText(raw.departDate)
+  const returnDate = asText(raw.returnDate)
+  const airlines = asTextList(raw.airlines)
+  const stops = asNumber(raw.stops)
+  const requestedBooking = asText(raw.bookingUrl) ?? asText(raw.url)
+  const keptBooking = safeBookingUrl(requestedBooking)
+  const bookingUrl =
+    keptBooking ??
+    itinerarySearchUrl({
+      originAirport,
+      destinationAirport,
+      departDate,
+      returnDate,
+      airlines,
+      stops,
+    })
+  const sourceUrl =
+    safeFareUrl(asText(raw.sourceUrl)) ??
+    (keptBooking ? undefined : safeFareUrl(requestedBooking))
 
   return {
     destinationCity,
@@ -212,11 +236,11 @@ function normalizeDeal(raw: Record<string, unknown>): Partial<FareDeal> {
     priceUsd: asNumber(raw.priceUsd),
     priceOriginal: asText(raw.priceOriginal),
     aboveRequestedCap: asBoolean(raw.aboveRequestedCap),
-    departDate: asText(raw.departDate),
-    returnDate: asText(raw.returnDate),
+    departDate,
+    returnDate,
     nights: asNumber(raw.nights),
-    airlines: asTextList(raw.airlines),
-    stops: asNumber(raw.stops),
+    airlines,
+    stops,
     connections: asTextList(raw.connections),
     travelTime: asText(raw.travelTime),
     fareBrand: asText(raw.fareBrand),
@@ -227,9 +251,9 @@ function normalizeDeal(raw: Record<string, unknown>): Partial<FareDeal> {
       .map(label => asEnum(label, DEAL_LABELS))
       .filter((label): label is DealLabel => Boolean(label)),
     whyGood: asText(raw.whyGood),
-    bookingUrl: asUrl(raw.bookingUrl),
-    sourceUrl: asUrl(raw.sourceUrl),
-    verifiedLive: asBoolean(raw.verifiedLive),
+    bookingUrl,
+    sourceUrl,
+    verifiedLive: bookingUrl ? asBoolean(raw.verifiedLive) : false,
     event: normalizeEvent(raw.event),
   }
 }

@@ -10,6 +10,7 @@ import type { Continent, TravelThemeId } from '@/lib/constants'
 import {
   CONTINENTS,
   FREE_SEARCH_LIMIT,
+  PLANS,
   SUBSCRIBER_DAILY_LIMIT,
   TRAVEL_THEMES,
 } from '@/lib/constants'
@@ -172,6 +173,7 @@ export function SearchForm() {
   return (
     <div className="space-y-8">
       <form
+        autoComplete="off"
         onSubmit={onSubmit}
         className="rounded-3xl border border-line bg-panel/90 p-4 shadow-(--elev) sm:p-8"
       >
@@ -231,7 +233,7 @@ export function SearchForm() {
               >
                 {CONTINENTS.map(item => (
                   <option key={item} value={item}>
-                    {item} — destination variable
+                    {item} (destination variable)
                   </option>
                 ))}
               </select>
@@ -351,7 +353,7 @@ export function SearchForm() {
             {quota.subscribed
               ? `${quota.remaining} of ${quota.dailyLimit} Pro searches left today`
               : quota.paywalled
-                ? 'Free hunt used — Pro unlocks 25 searches/day'
+                ? 'Free hunt used, purchase Pro to unlock 25 searches/day'
                 : `${quota.remaining} free hunt remaining`}
           </p>
           {isSignedIn || (!quota.paywalled && quota.remaining > 0) ? (
@@ -386,8 +388,7 @@ export function SearchForm() {
                 Your free hunt is used
               </h2>
               <p className="mt-2 max-w-xl text-mute">
-                Pro is $5/month or $50/year and includes 25 live fare hunts per
-                day.
+                {`Pro includes 25 cheap flight hunts per day.`}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {isSignedIn ? (
@@ -397,14 +398,14 @@ export function SearchForm() {
                       onClick={() => startCheckout('month')}
                       className="rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold"
                     >
-                      $5 / month
+                      ${PLANS.monthly.amountUsd} / month
                     </button>
                     <button
                       type="button"
                       onClick={() => startCheckout('year')}
                       className="rounded-full border border-gold px-5 py-2 text-sm text-gold"
                     >
-                      $50 / year
+                      ${PLANS.yearly.amountUsd} / year
                     </button>
                   </>
                 ) : (
