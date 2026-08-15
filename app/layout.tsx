@@ -10,6 +10,7 @@ import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
   indexRobots,
+  shareImage,
   SITE_NAME,
   TITLE_TEMPLATE,
 } from '@/lib/seo'
@@ -65,11 +66,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    images: [shareImage],
   },
   twitter: {
     card: 'summary_large_image',
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
+    images: [shareImage],
   },
   appleWebApp: {
     title: SITE_NAME,

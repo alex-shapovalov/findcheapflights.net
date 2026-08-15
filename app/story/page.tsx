@@ -4,7 +4,7 @@ import { pageMetadata, storyIndexJsonLd } from '@/lib/seo'
 import { getStoryEntries } from '@/lib/story'
 
 export const metadata = pageMetadata({
-  title: 'Find Cheap Flights: Updates and Journal',
+  title: 'Find Cheap Flights — Updates and Journal',
   description:
     'A dated journal of what findcheapflights.ai has shipped and updates on what is coming next.',
   path: '/story',

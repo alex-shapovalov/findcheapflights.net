@@ -6,9 +6,19 @@ import type { StoryEntry } from './story'
 export const SITE_NAME = APP_NAME
 export const SITE_DOMAIN = 'findcheapflights.ai'
 
-export const DEFAULT_TITLE = 'Find Cheap Flights: Search for live cheap fares'
+export const DEFAULT_TITLE = 'Find Cheap Flights — search live cheap fares'
 export const DEFAULT_DESCRIPTION =
   'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
+export const SHARE_IMAGE_PATH = '/og.png'
+export const SHARE_IMAGE_ALT = 'Find cheap flights. Lock-in the best deals.'
+export const shareImage = {
+  url: SHARE_IMAGE_PATH,
+  secureUrl: `${SITE_URL}${SHARE_IMAGE_PATH}`,
+  width: 1200,
+  height: 630,
+  type: 'image/png',
+  alt: SHARE_IMAGE_ALT,
+} as const
 
 export const TITLE_TEMPLATE = `%s | ${SITE_NAME}`
 
@@ -97,11 +107,13 @@ export function pageMetadata({
       description,
       siteName: SITE_NAME,
       locale: 'en_US',
+      images: [shareImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: resolvedTitle,
       description,
+      images: [shareImage],
     },
   }
 }
@@ -132,11 +144,13 @@ export function articleMetadata({
       siteName: SITE_NAME,
       locale: 'en_US',
       publishedTime,
+      images: [shareImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: resolvedTitle,
       description,
+      images: [shareImage],
     },
   }
 }

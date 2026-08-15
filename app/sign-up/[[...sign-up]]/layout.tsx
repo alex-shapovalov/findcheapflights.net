@@ -4,7 +4,7 @@ import { noIndexMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = {
   ...noIndexMetadata,
-  title: 'Find Cheap Flights: Sign up',
+  title: 'Find Cheap Flights — Sign up',
   description:
     'Create a findcheapflights.ai account to subscribe after your free fare hunt.',
 }
