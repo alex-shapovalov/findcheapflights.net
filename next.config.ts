@@ -1,17 +1,27 @@
 import type { NextConfig } from 'next'
 
+const clerkHosts = [
+  'https://*.clerk.accounts.dev',
+  'https://*.clerk.com',
+  'https://*.protect.clerk.com',
+  'https://clerk.findcheapflights.ai',
+  'https://accounts.findcheapflights.ai',
+  'https://clerk.findcheapflights.net',
+  'https://accounts.findcheapflights.net',
+].join(' ')
+
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.clerk.accounts.dev https://*.clerk.com https://*.protect.clerk.com https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com",
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkHosts} https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://img.clerk.com https://*.stripe.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://*.protect.clerk.com https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud",
-  "frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://*.protect.clerk.com https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://*.js.stripe.com",
+  `connect-src 'self' ${clerkHosts} https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud`,
+  `frame-src 'self' ${clerkHosts} https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://*.js.stripe.com`,
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  `form-action 'self' ${clerkHosts}`,
   "frame-ancestors 'none'",
 ].join('; ')
 
