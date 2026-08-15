@@ -4,7 +4,7 @@ import {
   FREE_IP_DAILY_LIMIT,
   FREE_SEARCH_LIMIT,
   QUOTA_IP_BURST_LIMIT,
-  SUBSCRIBER_DAILY_LIMIT,
+  SUBSCRIBER_MONTHLY_LIMIT,
 } from '@/lib/constants'
 import { api, getAuthedConvex } from '@/lib/convex-server'
 import { applyGuestUsageToUser, getGuestId, guestQuota } from '@/lib/guest'
@@ -30,8 +30,8 @@ export async function GET(request: Request) {
       signedIn: false,
       subscribed: false,
       lifetimeUsed: quota.lifetimeUsed,
-      dailyUsed: 0,
-      dailyLimit: SUBSCRIBER_DAILY_LIMIT,
+      monthlyUsed: 0,
+      monthlyLimit: SUBSCRIBER_MONTHLY_LIMIT,
       remaining: quota.remaining,
       paywalled: quota.paywalled,
     })
@@ -46,21 +46,21 @@ export async function GET(request: Request) {
   const subscribed = hasActiveAccess(profile)
   let lifetimeUsed = profile?.lifetimeSearchCount ?? 0
   lifetimeUsed = await applyGuestUsageToUser(convex, lifetimeUsed, subscribed)
-  const dailyUsed = subscribed ? await getSubscriberUsage(userId) : 0
+  const monthlyUsed = subscribed ? await getSubscriberUsage(userId) : 0
   const freeIpExhausted =
     !subscribed && (await getFreeIpUsage(ip)) >= FREE_IP_DAILY_LIMIT
   const paywalled =
     !subscribed && (lifetimeUsed >= FREE_SEARCH_LIMIT || freeIpExhausted)
   const remaining = subscribed
-    ? Math.max(0, SUBSCRIBER_DAILY_LIMIT - dailyUsed)
+    ? Math.max(0, SUBSCRIBER_MONTHLY_LIMIT - monthlyUsed)
     : Math.max(0, FREE_SEARCH_LIMIT - lifetimeUsed)
 
   return Response.json({
     signedIn: true,
     subscribed,
     lifetimeUsed,
-    dailyUsed,
-    dailyLimit: SUBSCRIBER_DAILY_LIMIT,
+    monthlyUsed,
+    monthlyLimit: SUBSCRIBER_MONTHLY_LIMIT,
     remaining: paywalled ? 0 : remaining,
     paywalled,
     interval: profile?.subscriptionInterval ?? null,

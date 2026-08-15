@@ -5,7 +5,7 @@ import {
   FREE_SEARCH_LIMIT,
   SEARCH_IP_BURST_LIMIT,
   SEARCH_USER_BURST_LIMIT,
-  SUBSCRIBER_DAILY_LIMIT,
+  SUBSCRIBER_MONTHLY_LIMIT,
 } from '@/lib/constants'
 import { api, getAuthedConvex } from '@/lib/convex-server'
 import { applyGuestUsageToUser, getGuestId } from '@/lib/guest'
@@ -108,12 +108,12 @@ export async function POST(request: Request) {
   let refundReservation: (() => Promise<unknown>) | null = null
 
   if (subscribed) {
-    const daily = await consumeSubscriberSearch(userId)
-    if (!daily.allowed) {
+    const monthly = await consumeSubscriberSearch(userId)
+    if (!monthly.allowed) {
       return Response.json(
         {
-          error: 'daily_limit',
-          message: `Pro includes ${SUBSCRIBER_DAILY_LIMIT} searches per day. Try again tomorrow.`,
+          error: 'monthly_limit',
+          message: `Pro includes ${SUBSCRIBER_MONTHLY_LIMIT} searches per month. Try again next month.`,
         },
         { status: 429 },
       )

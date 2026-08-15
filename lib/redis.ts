@@ -3,7 +3,7 @@ import {
   BURST_WINDOW_SECONDS,
   FREE_IP_DAILY_LIMIT,
   FREE_SEARCH_LIMIT,
-  SUBSCRIBER_DAILY_LIMIT,
+  SUBSCRIBER_MONTHLY_LIMIT,
 } from './constants'
 
 let redis: Redis | null = null
@@ -24,6 +24,7 @@ export function getRedis() {
 const DAY_SECONDS = 60 * 60 * 24
 const GUEST_TTL_SECONDS = DAY_SECONDS * 90
 const DAILY_TTL_SECONDS = 60 * 60 * 36
+const MONTHLY_TTL_SECONDS = DAY_SECONDS * 40
 
 type Budget = {
   key: string
@@ -83,8 +84,12 @@ function utcDay() {
   return new Date().toISOString().slice(0, 10)
 }
 
-function subscriberDayKey(clerkId: string) {
-  return `fcf:search:day:${clerkId}:${utcDay()}`
+function utcMonth() {
+  return new Date().toISOString().slice(0, 7)
+}
+
+function subscriberMonthKey(clerkId: string) {
+  return `fcf:search:month:${clerkId}:${utcMonth()}`
 }
 
 function guestKey(guestId: string) {
@@ -114,14 +119,14 @@ export async function consumeBurst(
 }
 
 export async function consumeSubscriberSearch(clerkId: string) {
-  const key = subscriberDayKey(clerkId)
+  const key = subscriberMonthKey(clerkId)
   const { allowed } = await consumeBudgets([
-    { key, limit: SUBSCRIBER_DAILY_LIMIT, ttlSeconds: DAILY_TTL_SECONDS },
+    { key, limit: SUBSCRIBER_MONTHLY_LIMIT, ttlSeconds: MONTHLY_TTL_SECONDS },
   ])
   if (!allowed) {
     return {
       allowed: false as const,
-      used: SUBSCRIBER_DAILY_LIMIT,
+      used: SUBSCRIBER_MONTHLY_LIMIT,
       remaining: 0,
     }
   }
@@ -129,16 +134,16 @@ export async function consumeSubscriberSearch(clerkId: string) {
   return {
     allowed: true as const,
     used,
-    remaining: Math.max(0, SUBSCRIBER_DAILY_LIMIT - used),
+    remaining: Math.max(0, SUBSCRIBER_MONTHLY_LIMIT - used),
   }
 }
 
 export async function refundSubscriberSearch(clerkId: string) {
-  await refundBudgets([subscriberDayKey(clerkId)])
+  await refundBudgets([subscriberMonthKey(clerkId)])
 }
 
 export function getSubscriberUsage(clerkId: string) {
-  return usageOf(subscriberDayKey(clerkId))
+  return usageOf(subscriberMonthKey(clerkId))
 }
 
 export function getGuestUsage(guestId: string) {

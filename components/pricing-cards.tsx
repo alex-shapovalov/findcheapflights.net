@@ -68,7 +68,8 @@ export function PricingCards() {
               Sign in
             </button>
           </SignInButton>{' '}
-          first. Checkout needs an account so we can attach your 25 daily hunts.
+          first. Checkout needs an account so we can attach your{' '}
+          {PLANS.monthly.searchesPerMonth} monthly hunts.
         </p>
       )}
       {isSignedIn && (
@@ -122,7 +123,7 @@ function PlanCard({
       </p>
       {note && <p className="mt-2 text-sm text-teal">{note}</p>}
       <ul className="mt-6 space-y-2 text-sm text-foam/90">
-        <li>25 live fare hunts per day</li>
+        <li>{PLANS.monthly.searchesPerMonth} live fare hunts per month</li>
         <li>Flexible origins or destinations</li>
         <li>Round trip or one way, with price bounds</li>
         <li>Saved search history</li>

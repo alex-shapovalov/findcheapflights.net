@@ -39,4 +39,4 @@ A $280 fare to a city with nothing you care about is not a deal. Themes — club
 
 We do not sit on a GDS and we do not ticket the flight. A deal-seeking model searches live public fare pages and writes a report with the listing. You book on the airline or OTA.
 
-That is the whole loop: nearby airports, a continent or a locked city, a window, a ceiling, a theme if you want one. [Run a hunt](/) — one search is free, then [Pro](/pricing) is 25 a day.
+That is the whole loop: nearby airports, a continent or a locked city, a window, a ceiling, a theme if you want one. [Run a hunt](/) — one search is free, then [Pro](/pricing) is 100 a month.

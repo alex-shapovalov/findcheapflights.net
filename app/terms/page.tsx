@@ -4,7 +4,7 @@ import {
   CONTACT_EMAIL,
   FREE_SEARCH_LIMIT,
   PLANS,
-  SUBSCRIBER_DAILY_LIMIT,
+  SUBSCRIBER_MONTHLY_LIMIT,
 } from '@/lib/constants'
 import { pageMetadata } from '@/lib/seo'
 
@@ -75,8 +75,9 @@ export default function TermsPage() {
           <li>
             Pro is {usd(PLANS.monthly.amountUsd)} per month or{' '}
             {usd(PLANS.yearly.amountUsd)} per year and includes up to{' '}
-            {SUBSCRIBER_DAILY_LIMIT} live searches per day. Daily limits reset
-            at 00:00 UTC and unused searches do not roll over. Listed prices
+            {SUBSCRIBER_MONTHLY_LIMIT} live searches per month. Monthly limits
+            reset at 00:00 UTC on the first of each month and unused searches
+            do not roll over. Listed prices
             may not include taxes that Stripe collects.
           </li>
           <li>

@@ -21,8 +21,8 @@ export type SearchRequest = {
 export type QuotaState = {
   subscribed: boolean
   lifetimeUsed: number
-  dailyUsed: number
-  dailyLimit: number
+  monthlyUsed: number
+  monthlyLimit: number
   remaining: number
   paywalled: boolean
 }

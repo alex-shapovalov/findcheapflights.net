@@ -20,16 +20,6 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/*': ['./content/story/**/*.md', './content/blog/**/*.md'],
   },
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.findcheapflights.ai' }],
-        destination: 'https://findcheapflights.ai/:path*',
-        permanent: true,
-      },
-    ]
-  },
   async headers() {
     return [
       {

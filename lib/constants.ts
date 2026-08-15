@@ -1,6 +1,6 @@
 export const FREE_SEARCH_LIMIT = 1
 export const FREE_IP_DAILY_LIMIT = 1
-export const SUBSCRIBER_DAILY_LIMIT = 25
+export const SUBSCRIBER_MONTHLY_LIMIT = 100
 export const BURST_WINDOW_SECONDS = 60
 export const SEARCH_IP_BURST_LIMIT = 6
 export const SEARCH_USER_BURST_LIMIT = 4
@@ -22,13 +22,13 @@ export const PLANS = {
     name: 'Pro Monthly',
     amountUsd: 11.99,
     interval: 'month' as const,
-    searchesPerDay: SUBSCRIBER_DAILY_LIMIT,
+    searchesPerMonth: SUBSCRIBER_MONTHLY_LIMIT,
   },
   yearly: {
     name: 'Pro Yearly',
     amountUsd: 119.99,
     interval: 'year' as const,
-    searchesPerDay: SUBSCRIBER_DAILY_LIMIT,
+    searchesPerMonth: SUBSCRIBER_MONTHLY_LIMIT,
   },
 } as const
 

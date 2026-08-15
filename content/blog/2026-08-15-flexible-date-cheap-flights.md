@@ -161,4 +161,4 @@ Instead of looking for one weekend, find a range of flexible dates. Let the fare
 
 If you follow these steps, cheap flights become less of a lottery. They become a regular part of traveling when you match your schedule with the less busy times on the airline’s calendar.
 
-[Set a window and hunt](/). One live search is free, then [Pro](/pricing) is 25 a day.
+[Set a window and hunt](/). One live search is free, then [Pro](/pricing) is 100 a month.

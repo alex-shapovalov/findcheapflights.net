@@ -11,7 +11,7 @@ import {
   CONTINENTS,
   FREE_SEARCH_LIMIT,
   PLANS,
-  SUBSCRIBER_DAILY_LIMIT,
+  SUBSCRIBER_MONTHLY_LIMIT,
   TRAVEL_THEMES,
 } from '@/lib/constants'
 import type {
@@ -25,8 +25,8 @@ import { AirportPicker } from './airport-picker'
 const emptyQuota: QuotaState = {
   subscribed: false,
   lifetimeUsed: 0,
-  dailyUsed: 0,
-  dailyLimit: SUBSCRIBER_DAILY_LIMIT,
+  monthlyUsed: 0,
+  monthlyLimit: SUBSCRIBER_MONTHLY_LIMIT,
   remaining: FREE_SEARCH_LIMIT,
   paywalled: false,
 }
@@ -151,7 +151,7 @@ export function SearchForm() {
     if (response.status === 429) {
       const data = (await response.json()) as { message?: string }
       setStatus('error')
-      setError(data.message ?? 'Daily search limit reached.')
+      setError(data.message ?? 'Monthly search limit reached.')
       await refreshQuota()
       return
     }
@@ -361,9 +361,9 @@ export function SearchForm() {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-mute">
             {quota.subscribed
-              ? `${quota.remaining} of ${quota.dailyLimit} Pro searches left today`
+              ? `${quota.remaining} of ${quota.monthlyLimit} Pro searches left this month`
               : quota.paywalled
-                ? 'Free hunt used, purchase Pro to unlock 25 searches/day'
+                ? `Free hunt used, purchase Pro to unlock ${SUBSCRIBER_MONTHLY_LIMIT} searches/month`
                 : `${quota.remaining} free hunt remaining`}
           </p>
           {isSignedIn || (!quota.paywalled && quota.remaining > 0) ? (
@@ -398,7 +398,7 @@ export function SearchForm() {
                 Your free hunt is used
               </h2>
               <p className="mt-2 max-w-xl text-mute">
-                {'Pro includes 25 cheap flight hunts per day.'}
+                {`Pro includes ${SUBSCRIBER_MONTHLY_LIMIT} cheap flight hunts per month.`}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {isSignedIn ? (

@@ -169,4 +169,4 @@ Be as loose with your destination as you can. Look up a destination from as many
 
 When you combine these approaches, you stop chasing mythical cheap flights and start generating solid, repeatable bargains. That is where the algorithms are hiding them.
 
-[Hunt with a flexible search](/). One live search is free, then [Pro](/pricing) is 25 a day.
+[Hunt with a flexible search](/). One live search is free, then [Pro](/pricing) is 100 a month.

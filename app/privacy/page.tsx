@@ -41,7 +41,7 @@ export default function PrivacyPage() {
           <li>
             <strong>Abuse-prevention data.</strong> Your IP address and a random
             guest identifier stored in a cookie, used as counters to enforce
-            free and daily search limits. This is collected whether or not you
+            free and monthly search limits. This is collected whether or not you
             have an account.
           </li>
           <li>
@@ -154,7 +154,8 @@ export default function PrivacyPage() {
         <p>
           Account records and signed-in search history stay until you ask us to
           delete them. They do not expire on their own. Rate-limit counters
-          expire automatically: daily counters within about 36 hours and guest
+          expire automatically: daily free-search counters within about 36
+          hours, monthly Pro counters within about 40 days, and guest
           counters within 90 days. After a deletion request we remove your
           Clerk login, Convex user record, and search history. Stripe and other
           providers may keep billing or log records as long as their own rules
