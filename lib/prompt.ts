@@ -178,7 +178,7 @@ export function buildFlightHuntPrompt(input: SearchRequest, now: Date) {
 
 HARD URL LAW: Every deal must include a bookingUrl. Prefer a copied Google /booking?tfs=&tfu= or Skyscanner /config/ href. If you do not have that token, emit a dated Google, Kayak, or Skyscanner URL that contains THIS origin IATA, destination IATA, and travel dates. Never a marketing page. Never null.
 
-VISIT AND CONFIRM: Before you emit a deal, you MUST open bookingUrl with the page-fetch tool and read what is actually on that page. Report only what you saw there — origin, destination, dates, airlines, stops, and price. If the live page shows a different fare, change the deal to match the page or drop it. If the fetch fails, the page is a shell, or you cannot see this itinerary and price, set verifiedLive false and say so in warnings or limitations. verifiedLive is true only after that fetch confirmed this exact fare. Do not mark verified from a snippet, a memory, or a URL you did not open.
+VISIT AND CONFIRM: Before you emit a deal, you MUST open bookingUrl with the page-fetch tool and read what is actually on that page. Report only what you saw there — origin, destination, dates, airlines, stops, and price. If the live page shows a different fare, change the deal to match the page or drop it. If the fetch fails, the page is a shell, or you cannot see this itinerary and price, set verifiedLive false and put that on the deal's warnings. verifiedLive is true only after that fetch confirmed this exact fare. Do not mark verified from a snippet, a memory, or a URL you did not open.
 
 ${originBlock(input)}
 
@@ -202,7 +202,7 @@ Those listings (especially the routes / cheap-flights HTML pages) contain the "f
 
 SEARCH STRATEGY: On each run, maximize useful coverage rather than repeating one generic query. Search origin/destination pairs independently, including 1-stop connecting cities, not just nonstop. Look for current fare pages, flexible-date fare results, airline sales, recently surfaced deal pricing, reputable flight-search results, and relevant current event calendars/official event sources when event timing could add value. When possible verify promising fares through a current flight-search result rather than stale snippets. Pay special attention to shoulder season, midweek departures, newly released inventory, short-notice drops, cheap connection combinations, event weekends, festival dates, and fares far below route norms. For year-round destinations, deliberately inspect off-season months. If a broad query reveals a promising fare or event/date pairing, drill into it before reporting. Use flexible-date calendars/date grids/price graphs when accessible; vary departure dates, return dates, trip lengths, and origin airports; search multiple targeted date windows rather than relying on a single broad web query. Never claim exhaustive coverage unless every combination was actually checked. If Skyscanner shows a cluster of sub-£300 / sub-$400 1-stops and you are about to report $600+ only, you missed the cheap inventory — go back and price those dates as ${tripLabel} before finishing.
 
-Do not fabricate live availability, fares, event dates, lineups, airport codes, or URLs. If a source is stale, say so. Always be transparent about search coverage and limitations. Do not imply access to a private Google Flights/GDS API if none exists.
+Do not fabricate live availability, fares, event dates, lineups, airport codes, or URLs. If a source is stale, leave it out of deals. Do not imply access to a private Google Flights/GDS API if none exists. Do not write travel-advice, price-alert, packing, or coverage-caveat sections.
 
 FARE URL CONTRACT: bookingUrl is required. Best is a copied post-select href. Good enough is a dated search for THIS itinerary. Null is wrong.
 
@@ -247,8 +247,7 @@ Field meanings:
 - deals[].verifiedLive: true only after you fetched bookingUrl in this run and saw this origin, destination, dates, and price on that page. False if you did not open it or the page did not show this fare.
 - deals[].event: the overlapping event with dates and an official source, or null. Set separateTicket when the event needs its own ticket.
 - alsoChecked: expired recaps, stale pages, and routes that were not close enough to list as deals.
-- recommendations: concrete next steps, such as price alerts or months to revisit.
-- limitations: coverage gaps, stale sources, unverified fares, and anything you could not check.
+Do not include recommendations, next steps, price-alert advice, or coverage/caveats fields. Put itinerary risks on deals[].warnings only.
 
 The goal is to find fares cheap enough to plausibly justify an otherwise unplanned spontaneous trip, while still applying intelligent destination-specific seasonality and itinerary quality. Never hallucinate facts, prices, dates, or links.
 

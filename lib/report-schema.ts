@@ -161,15 +161,7 @@ export const FARE_REPORT_SCHEMA = {
   schema: {
     type: 'object',
     additionalProperties: false,
-    required: [
-      'headline',
-      'verdict',
-      'summary',
-      'deals',
-      'alsoChecked',
-      'recommendations',
-      'limitations',
-    ],
+    required: ['headline', 'verdict', 'summary', 'deals', 'alsoChecked'],
     properties: {
       headline: {
         type: 'string',
@@ -211,14 +203,6 @@ export const FARE_REPORT_SCHEMA = {
             note: stringOrNull,
           },
         },
-      },
-      recommendations: {
-        ...stringArray,
-        description: 'What the traveler should do next.',
-      },
-      limitations: {
-        ...stringArray,
-        description: 'Coverage gaps, stale sources, unverified fares.',
       },
     },
   },

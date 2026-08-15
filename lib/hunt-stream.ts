@@ -152,8 +152,6 @@ export function createHuntProgress() {
       if (parsed.summary) score += 5
       score += Math.min(48, (parsed.deals?.length ?? 0) * 8)
       score += Math.min(8, (parsed.alsoChecked?.length ?? 0) * 1)
-      score += Math.min(4, (parsed.recommendations?.length ?? 0) * 1)
-      score += Math.min(4, (parsed.limitations?.length ?? 0) * 1)
     }
     return clampPercent(78 + Math.min(21, (score / 80) * 21))
   }

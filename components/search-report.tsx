@@ -113,8 +113,6 @@ function HuntProgress({ percent, label }: { percent: number; label: string }) {
 function StructuredReport({ report }: { report: PartialFareReport }) {
   const deals = report.deals ?? []
   const alsoChecked = (report.alsoChecked ?? []).filter(item => item.route)
-  const recommendations = report.recommendations ?? []
-  const limitations = report.limitations ?? []
 
   return (
     <div className="space-y-8">
@@ -144,14 +142,6 @@ function StructuredReport({ report }: { report: PartialFareReport }) {
       )}
 
       {alsoChecked.length > 0 && <AlsoChecked items={alsoChecked} />}
-
-      {recommendations.length > 0 && (
-        <Notes title="What to do next" items={recommendations} tone="foam" />
-      )}
-
-      {limitations.length > 0 && (
-        <Notes title="Coverage and caveats" items={limitations} tone="mute" />
-      )}
     </div>
   )
 }
@@ -374,36 +364,6 @@ function AlsoChecked({ items }: { items: Array<Partial<CheckedFare>> }) {
                 <span className="text-foam/80">{formatUsd(item.priceUsd)}</span>
               )}
             </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-function Notes({
-  title,
-  items,
-  tone,
-}: {
-  title: string
-  items: string[]
-  tone: 'foam' | 'mute'
-}) {
-  return (
-    <div>
-      <h3 className="text-xs uppercase tracking-[0.18em] text-mute">{title}</h3>
-      <ul className="mt-3 space-y-2">
-        {items.map(item => (
-          <li
-            key={item}
-            className={cn(
-              'flex gap-3 text-sm leading-6',
-              tone === 'foam' ? 'text-foam/85' : 'text-mute',
-            )}
-          >
-            <span className="text-gold">—</span>
-            <span>{item}</span>
           </li>
         ))}
       </ul>

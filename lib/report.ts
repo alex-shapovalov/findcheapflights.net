@@ -103,12 +103,7 @@ export function parseFareReport(text: string): PartialFareReport | null {
 }
 
 export function hasReportContent(report: PartialFareReport) {
-  return Boolean(
-    report.headline ||
-      report.summary ||
-      report.deals?.length ||
-      report.recommendations?.length,
-  )
+  return Boolean(report.headline || report.summary || report.deals?.length)
 }
 
 function* repairCandidates(source: string) {
