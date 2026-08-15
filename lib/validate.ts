@@ -1,4 +1,4 @@
-import { CONTINENTS, isTravelThemeId } from './constants'
+import { CONTINENTS, isTravelThemeId, SEARCH_HORIZON_MONTHS } from './constants'
 import type { SearchMode, SearchRequest, TripType } from './types'
 
 const IATA = /^[A-Z]{3}$/
@@ -35,7 +35,7 @@ export function parseSearchRequest(body: unknown): SearchRequest {
     throw new Error('Select at least one destination airport')
   }
 
-  return {
+  const result: SearchRequest = {
     mode: mode as SearchMode,
     tripType: tripType as TripType,
     originAirports,
@@ -52,6 +52,9 @@ export function parseSearchRequest(body: unknown): SearchRequest {
     maxNights: optionalNumber(input.maxNights, 'max nights'),
     interests: isTravelThemeId(input.interests) ? input.interests : undefined,
   }
+
+  assertSensibleDates(result.dateFrom, result.dateTo)
+  return result
 }
 
 function uniqueIatas(value: unknown) {
@@ -77,5 +80,45 @@ function optionalDate(value: unknown, label: string) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     throw new Error(`Invalid ${label}`)
   }
+  const [year, month, day] = value.split('-').map(Number)
+  const parsed = new Date(Date.UTC(year, month - 1, day))
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new Error(`Invalid ${label}`)
+  }
   return value
+}
+
+function utcToday() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function shiftUtcDate(iso: string, months: number, days = 0) {
+  const [year, month, day] = iso.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day + days))
+  date.setUTCMonth(date.getUTCMonth() + months)
+  return date.toISOString().slice(0, 10)
+}
+
+function assertSensibleDates(dateFrom?: string, dateTo?: string) {
+  const earliest = shiftUtcDate(utcToday(), 0, -1)
+  const latest = shiftUtcDate(utcToday(), SEARCH_HORIZON_MONTHS)
+  if (dateFrom && dateFrom < earliest) {
+    throw new Error('Search from cannot be in the past')
+  }
+  if (dateTo && dateTo < earliest) {
+    throw new Error('Search until cannot be in the past')
+  }
+  if (dateFrom && dateFrom > latest) {
+    throw new Error('Search from is too far in the future')
+  }
+  if (dateTo && dateTo > latest) {
+    throw new Error('Search until is too far in the future')
+  }
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    throw new Error('Search from must be on or before search until')
+  }
 }

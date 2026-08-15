@@ -11,6 +11,7 @@ import {
   CONTINENTS,
   FREE_SEARCH_LIMIT,
   PLANS,
+  SEARCH_HORIZON_MONTHS,
   SUBSCRIBER_MONTHLY_LIMIT,
   TRAVEL_THEMES,
 } from '@/lib/constants'
@@ -97,8 +98,27 @@ export function SearchForm() {
     setError(data.error ?? 'Could not start checkout.')
   }
 
+  const today = localIsoDate()
+  const latest = addLocalMonths(today, SEARCH_HORIZON_MONTHS)
+
+  function onDateFromChange(value: string) {
+    setDateFrom(value)
+    if (value && dateTo && value > dateTo) setDateTo(value)
+  }
+
+  function onDateToChange(value: string) {
+    setDateTo(value)
+    if (value && dateFrom && value < dateFrom) setDateFrom(value)
+  }
+
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault()
+    const dateError = invalidSearchDates(dateFrom, dateTo, today, latest)
+    if (dateError) {
+      setError(dateError)
+      setStatus('error')
+      return
+    }
     setError('')
     setPaywall(false)
     setReport('')
@@ -294,12 +314,16 @@ export function SearchForm() {
             <DateField
               label="Search from"
               value={dateFrom}
-              onChange={setDateFrom}
+              min={today}
+              max={dateTo || latest}
+              onChange={onDateFromChange}
             />
             <DateField
               label="Search until"
               value={dateTo}
-              onChange={setDateTo}
+              min={dateFrom || today}
+              max={latest}
+              onChange={onDateToChange}
             />
           </div>
 
@@ -474,10 +498,14 @@ function NumberField({
 function DateField({
   label,
   value,
+  min,
+  max,
   onChange,
 }: {
   label: string
   value: string
+  min?: string
+  max?: string
   onChange: (value: string) => void
 }) {
   return (
@@ -488,9 +516,45 @@ function DateField({
       <input
         type="date"
         value={value}
+        min={min}
+        max={max}
         onChange={event => onChange(event.target.value)}
         className="w-full rounded-xl border border-line bg-panel-2 px-3 py-3 outline-none"
       />
     </label>
   )
+}
+
+function localIsoDate(date = new Date()) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function addLocalMonths(iso: string, months: number) {
+  const [year, month, day] = iso.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  date.setMonth(date.getMonth() + months)
+  return localIsoDate(date)
+}
+
+function invalidSearchDates(
+  dateFrom: string,
+  dateTo: string,
+  today: string,
+  latest: string,
+) {
+  if (dateFrom && dateFrom < today) return 'Search from cannot be in the past'
+  if (dateTo && dateTo < today) return 'Search until cannot be in the past'
+  if (dateFrom && dateFrom > latest) {
+    return 'Search from is too far in the future'
+  }
+  if (dateTo && dateTo > latest) {
+    return 'Search until is too far in the future'
+  }
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    return 'Search from must be on or before search until'
+  }
+  return ''
 }
