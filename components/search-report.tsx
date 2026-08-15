@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CircleCheck,
   ExternalLink,
+  LoaderCircle,
   Ticket,
   TriangleAlert,
 } from 'lucide-react'
@@ -48,9 +49,13 @@ const LABEL_TEXT: Record<DealLabel, string> = {
 export function SearchReport({
   text,
   running,
+  percent = 0,
+  label = 'Warming up the passport',
 }: {
   text: string
   running?: boolean
+  percent?: number
+  label?: string
 }) {
   const parsed = parseFareReport(text)
   const report = parsed && hasReportContent(parsed) ? parsed : null
@@ -61,16 +66,47 @@ export function SearchReport({
         <h2 className="font-display text-xl sm:text-2xl">Fare report</h2>
         {running && (
           <span className="shrink-0 text-xs uppercase tracking-[0.2em] text-teal">
-            Searching live sources
+            {Math.round(percent)}%
           </span>
         )}
       </div>
+      {running && <HuntProgress percent={percent} label={label} />}
       {report ? (
         <StructuredReport report={report} />
       ) : (
         <RawReport text={text} running={running} />
       )}
     </section>
+  )
+}
+
+function HuntProgress({ percent, label }: { percent: number; label: string }) {
+  const value = Math.max(0, Math.min(100, Math.round(percent)))
+  return (
+    <div className="mb-6 rounded-2xl border border-line bg-panel-2 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2 text-sm text-foam">
+          <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-teal" />
+          <span className="truncate">{label}</span>
+        </div>
+        <span className="shrink-0 tabular-nums text-sm text-gold">
+          {value}%
+        </span>
+      </div>
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={value}
+        aria-label={label}
+        className="mt-3 h-1.5 overflow-hidden rounded-full bg-line"
+      >
+        <div
+          className="h-full rounded-full bg-gold transition-[width] duration-300 ease-out"
+          style={{ width: `${value}%` }}
+        />
+      </div>
+    </div>
   )
 }
 

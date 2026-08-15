@@ -15,6 +15,7 @@ import {
   SUBSCRIBER_MONTHLY_LIMIT,
   TRAVEL_THEMES,
 } from '@/lib/constants'
+import { parseHuntEvent } from '@/lib/hunt-stream'
 import type {
   QuotaState,
   SearchMode,
@@ -53,6 +54,8 @@ export function SearchForm() {
   )
   const [error, setError] = useState('')
   const [paywall, setPaywall] = useState(false)
+  const [huntPercent, setHuntPercent] = useState(0)
+  const [huntLabel, setHuntLabel] = useState('Warming up the passport')
   const outcomeRef = useRef<HTMLDivElement>(null)
 
   const refreshQuota = useCallback(async () => {
@@ -122,6 +125,8 @@ export function SearchForm() {
     setError('')
     setPaywall(false)
     setReport('')
+    setHuntPercent(2)
+    setHuntLabel('Warming up the passport')
     setStatus('running')
 
     const payload: SearchRequest = {
@@ -178,12 +183,34 @@ export function SearchForm() {
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
     let text = ''
+    let buffer = ''
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      text += decoder.decode(value, { stream: true })
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() ?? ''
+      for (const line of lines) {
+        const event = parseHuntEvent(line)
+        if (!event) continue
+        if (event.type === 'progress') {
+          setHuntPercent(event.percent)
+          setHuntLabel(event.label)
+          continue
+        }
+        text += event.text
+        setReport(text)
+      }
+    }
+    const trailing = parseHuntEvent(buffer)
+    if (trailing?.type === 'progress') {
+      setHuntPercent(trailing.percent)
+      setHuntLabel(trailing.label)
+    } else if (trailing?.type === 'chunk') {
+      text += trailing.text
       setReport(text)
     }
+    setHuntPercent(100)
     setStatus('done')
     await refreshQuota()
   }
@@ -462,7 +489,12 @@ export function SearchForm() {
           )}
 
           {(status === 'running' || report) && (
-            <SearchReport text={report} running={status === 'running'} />
+            <SearchReport
+              text={report}
+              running={status === 'running'}
+              percent={huntPercent}
+              label={huntLabel}
+            />
           )}
         </div>
       )}

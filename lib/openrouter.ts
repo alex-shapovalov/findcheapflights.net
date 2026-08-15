@@ -1,4 +1,10 @@
 import { APP_URL, OPENROUTER_MODEL } from './constants'
+import {
+  createHuntProgress,
+  HUNT_FETCH_MAX_USES,
+  HUNT_SEARCH_MAX_USES,
+  type HuntClientEvent,
+} from './hunt-stream'
 import { buildFlightHuntPrompt } from './prompt'
 import { FARE_REPORT_SCHEMA } from './report-schema'
 import type { SearchRequest } from './types'
@@ -26,7 +32,7 @@ export async function streamFlightHunt(input: SearchRequest) {
 
   return response.body
     .pipeThrough(new TextDecoderStream())
-    .pipeThrough(openRouterTextStream())
+    .pipeThrough(openRouterHuntStream())
 }
 
 function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
@@ -41,6 +47,7 @@ function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
     body: JSON.stringify({
       model: OPENROUTER_MODEL,
       stream: true,
+      stream_options: { include_usage: true },
       temperature: 0.2,
       messages: [
         {
@@ -58,6 +65,7 @@ function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
             },
           }
         : {}),
+      reasoning: { enabled: true },
       tools: [
         {
           type: 'openrouter:datetime',
@@ -66,13 +74,13 @@ function requestHunt(apiKey: string, prompt: string, withSchema: boolean) {
           type: 'openrouter:web_search',
           parameters: {
             max_results: 10,
-            max_uses: 24,
+            max_uses: HUNT_SEARCH_MAX_USES,
           },
         },
         {
           type: 'openrouter:web_fetch',
           parameters: {
-            max_uses: 20,
+            max_uses: HUNT_FETCH_MAX_USES,
             max_content_tokens: 24000,
           },
         },
@@ -87,45 +95,28 @@ function isSchemaUnsupported(status: number, detail: string) {
   return /response_format|json_schema|structured output/i.test(detail)
 }
 
-function openRouterTextStream() {
+function openRouterHuntStream() {
   let buffer = ''
-  return new TransformStream<string, string>({
+  const progress = createHuntProgress()
+  return new TransformStream<string, HuntClientEvent>({
+    start(controller) {
+      controller.enqueue(progress.snapshot())
+    },
     transform(chunk, controller) {
       buffer += chunk
       const lines = buffer.split('\n')
       buffer = lines.pop() ?? ''
       for (const line of lines) {
-        const text = parseSseLine(line)
-        if (text) controller.enqueue(text)
+        for (const event of progress.applySseLine(line)) {
+          controller.enqueue(event)
+        }
       }
     },
     flush(controller) {
-      const text = parseSseLine(buffer)
-      if (text) controller.enqueue(text)
+      for (const event of progress.applySseLine(buffer)) {
+        controller.enqueue(event)
+      }
+      controller.enqueue(progress.finish())
     },
   })
-}
-
-function parseSseLine(line: string) {
-  const trimmed = line.trim()
-  if (!trimmed.startsWith('data:')) return ''
-  const data = trimmed.slice(5).trim()
-  if (!data || data === '[DONE]') return ''
-  try {
-    const json = JSON.parse(data) as {
-      choices?: Array<{
-        delta?: { content?: string | Array<{ type?: string; text?: string }> }
-      }>
-    }
-    const content = json.choices?.[0]?.delta?.content
-    if (typeof content === 'string') return content
-    if (Array.isArray(content)) {
-      return content
-        .map(part => (typeof part === 'object' ? (part.text ?? '') : ''))
-        .join('')
-    }
-    return ''
-  } catch {
-    return ''
-  }
 }

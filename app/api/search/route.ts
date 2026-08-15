@@ -9,6 +9,7 @@ import {
 } from '@/lib/constants'
 import { api, getAuthedConvex } from '@/lib/convex-server'
 import { applyGuestUsageToUser, getGuestId } from '@/lib/guest'
+import { encodeHuntEvent, type HuntClientEvent } from '@/lib/hunt-stream'
 import { streamFlightHunt } from '@/lib/openrouter'
 import {
   consumeBurst,
@@ -161,7 +162,7 @@ function huntResponse(
 ) {
   const encoder = new TextEncoder()
   let report = ''
-  let upstream: ReadableStreamDefaultReader<string> | null = null
+  let upstream: ReadableStreamDefaultReader<HuntClientEvent> | null = null
   let cancelled = false
 
   const stream = new ReadableStream<Uint8Array>({
@@ -173,8 +174,8 @@ function huntResponse(
         while (true) {
           const { done, value } = await upstream.read()
           if (done) break
-          report += value
-          controller.enqueue(encoder.encode(value))
+          if (value.type === 'chunk') report += value.text
+          controller.enqueue(encoder.encode(encodeHuntEvent(value)))
         }
         if (cancelled) {
           await hooks
@@ -192,7 +193,11 @@ function huntResponse(
         await hooks.onFail(message, !started).catch(() => undefined)
         if (cancelled) return
         try {
-          controller.enqueue(encoder.encode(`\n\n${message}`))
+          controller.enqueue(
+            encoder.encode(
+              encodeHuntEvent({ type: 'chunk', text: `\n\n${message}` }),
+            ),
+          )
           controller.close()
         } catch {
           // the client is already gone; nothing left to report to
@@ -207,7 +212,7 @@ function huntResponse(
 
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
+      'Content-Type': 'application/x-ndjson; charset=utf-8',
       'Cache-Control': 'no-store',
       ...(hooks.searchId ? { 'X-Search-Id': String(hooks.searchId) } : {}),
     },

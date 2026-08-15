@@ -48,49 +48,78 @@ export function PricingCards() {
     setError(data.error ?? 'No billing portal yet.')
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-5 md:grid-cols-2">
-        <PlanCard
-          name={PLANS.monthly.name}
-          price={`$${PLANS.monthly.amountUsd}`}
-          cadence="per month"
-          cta={busy === 'month' ? 'Redirecting...' : 'Start monthly'}
-          featured={false}
-          signedIn={Boolean(isSignedIn)}
-          onClick={() => checkout('month')}
-        />
-        <PlanCard
-          name={PLANS.yearly.name}
-          price={`$${PLANS.yearly.amountUsd}`}
-          cadence="per year"
-          cta={busy === 'year' ? 'Redirecting...' : 'Start yearly'}
-          featured
-          signedIn={Boolean(isSignedIn)}
-          onClick={() => checkout('year')}
-        />
-      </div>
-      {!isSignedIn && (
-        <p className="text-sm text-mute">
-          <SignInButton mode="modal">
-            <button type="button" className="text-gold underline">
-              Sign in
-            </button>
-          </SignInButton>{' '}
-          first. Checkout needs an account so we can attach your{' '}
-          {PLANS.monthly.searchesPerMonth} monthly hunts.
+  if (isSignedIn && user === undefined) {
+    return null
+  }
+
+  if (subscribed) {
+    return (
+      <div className="max-w-xl">
+        <p className="text-xs uppercase tracking-[0.28em] text-gold">Pro</p>
+        <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
+          You are already on Pro.
+        </h1>
+        <p className="mt-4 text-mute">
+          Update your payment method, switch plans, or cancel from the billing
+          portal.
         </p>
-      )}
-      {isSignedIn && subscribed && (
         <button
           type="button"
           onClick={portal}
-          className="text-sm text-mute underline hover:text-foam"
+          className="mt-8 rounded-full bg-gold px-6 py-3 font-medium text-on-gold"
         >
           {busy === 'portal' ? 'Opening portal...' : 'Manage billing'}
         </button>
-      )}
-      {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-[0.28em] text-gold">Pro</p>
+      <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
+        One free cheap-flight hunt. Then 100 a month.
+      </h1>
+      <p className="mt-4 max-w-2xl text-mute">
+        Every aaccount a free trial to test us out. Subscribe for $11.99/month
+        or $119.99/year to keep hunting; no GDS, just aggresive searching to get
+        you the best deals.
+      </p>
+      <div className="mt-10 space-y-6">
+        <div className="grid gap-5 md:grid-cols-2">
+          <PlanCard
+            name={PLANS.monthly.name}
+            price={`$${PLANS.monthly.amountUsd}`}
+            cadence="per month"
+            cta={busy === 'month' ? 'Redirecting...' : 'Start monthly'}
+            featured={false}
+            signedIn={Boolean(isSignedIn)}
+            onClick={() => checkout('month')}
+          />
+          <PlanCard
+            name={PLANS.yearly.name}
+            price={`$${PLANS.yearly.amountUsd}`}
+            cadence="per year"
+            cta={busy === 'year' ? 'Redirecting...' : 'Start yearly'}
+            featured
+            signedIn={Boolean(isSignedIn)}
+            onClick={() => checkout('year')}
+          />
+        </div>
+        {!isSignedIn && (
+          <p className="text-sm text-mute">
+            <SignInButton mode="modal">
+              <button type="button" className="text-gold underline">
+                Sign in
+              </button>
+            </SignInButton>{' '}
+            first. Checkout needs an account so we can attach your{' '}
+            {PLANS.monthly.searchesPerMonth} monthly hunts.
+          </p>
+        )}
+        {error && <p className="text-sm text-danger">{error}</p>}
+      </div>
     </div>
   )
 }
