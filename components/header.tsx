@@ -27,7 +27,11 @@ export function Header() {
         user.subscriptionStatus === 'trialing') &&
       (user.currentPeriodEnd == null || user.currentPeriodEnd > Date.now()),
   )
-  const navLinks = links.filter(link => link.href !== '/pricing' || !subscribed)
+  const navLinks = links.map(link =>
+    link.href === '/pricing' && subscribed
+      ? { ...link, label: 'Billing' }
+      : link,
+  )
 
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-ink/80 backdrop-blur-md">
