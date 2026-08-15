@@ -3,7 +3,6 @@
 import { useQuery } from 'convex/react'
 import Link from 'next/link'
 import { api } from '@/convex/_generated/api'
-import type { Doc } from '@/convex/_generated/dataModel'
 import { travelThemeLabel } from '@/lib/constants'
 
 export default function HistoryPage() {
@@ -20,7 +19,7 @@ export default function HistoryPage() {
         {searches?.length === 0 && (
           <p className="text-mute">No searches yet.</p>
         )}
-        {searches?.map((search: Doc<'searches'>) => {
+        {searches?.map(search => {
           const themeLabel = travelThemeLabel(search.interests)
           return (
             <Link

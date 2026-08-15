@@ -136,7 +136,15 @@ export async function POST(request: Request) {
     }
   }
 
-  const searchId = await convex.mutation(api.searches.create, payload)
+  const searchId = await convex.mutation(api.searches.create, {
+    mode: payload.mode,
+    tripType: payload.tripType,
+    originAirports: payload.originAirports,
+    destinationAirports: payload.destinationAirports,
+    continent: payload.continent,
+    maxPrice: payload.maxPrice,
+    interests: payload.interests,
+  })
   return huntResponse(payload, {
     searchId,
     onComplete: result =>

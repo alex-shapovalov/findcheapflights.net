@@ -32,12 +32,7 @@ export default defineSchema({
     originAirports: v.array(v.string()),
     destinationAirports: v.array(v.string()),
     continent: v.optional(v.string()),
-    minPrice: v.optional(v.number()),
     maxPrice: v.optional(v.number()),
-    dateFrom: v.optional(v.string()),
-    dateTo: v.optional(v.string()),
-    minNights: v.optional(v.number()),
-    maxNights: v.optional(v.number()),
     interests: v.optional(v.string()),
     status: v.union(
       v.literal('running'),

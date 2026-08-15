@@ -27,12 +27,7 @@ export const create = mutation({
     originAirports: v.array(v.string()),
     destinationAirports: v.array(v.string()),
     continent: v.optional(v.string()),
-    minPrice: v.optional(v.number()),
     maxPrice: v.optional(v.number()),
-    dateFrom: v.optional(v.string()),
-    dateTo: v.optional(v.string()),
-    minNights: v.optional(v.number()),
-    maxNights: v.optional(v.number()),
     interests: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -50,11 +45,13 @@ export const create = mutation({
     }
 
     return await ctx.db.insert('searches', {
-      ...args,
       clerkId,
+      mode: args.mode,
+      tripType: args.tripType,
       originAirports,
       destinationAirports: iataCodes(args.destinationAirports),
       continent: args.continent ? boundedString(args.continent, 40) : undefined,
+      maxPrice: args.maxPrice,
       interests: args.interests
         ? boundedString(args.interests, MAX_THEME_CHARS)
         : undefined,
@@ -110,11 +107,23 @@ export const listMine = query({
   handler: async ctx => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) return []
-    return await ctx.db
+    const rows = await ctx.db
       .query('searches')
       .withIndex('by_clerkId', q => q.eq('clerkId', identity.subject))
       .order('desc')
       .take(30)
+    return rows.map(search => ({
+      _id: search._id,
+      _creationTime: search._creationTime,
+      mode: search.mode,
+      tripType: search.tripType,
+      originAirports: search.originAirports,
+      destinationAirports: search.destinationAirports,
+      continent: search.continent,
+      maxPrice: search.maxPrice,
+      interests: search.interests,
+      status: search.status,
+    }))
   },
 })
 
