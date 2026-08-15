@@ -1,11 +1,20 @@
 'use client'
 
 import { SignInButton, useAuth } from '@clerk/nextjs'
+import { useQuery } from 'convex/react'
 import { useState } from 'react'
+import { api } from '@/convex/_generated/api'
 import { PLANS } from '@/lib/constants'
 
 export function PricingCards() {
   const { isSignedIn } = useAuth()
+  const user = useQuery(api.users.me)
+  const subscribed = Boolean(
+    user &&
+      (user.subscriptionStatus === 'active' ||
+        user.subscriptionStatus === 'trialing') &&
+      (user.currentPeriodEnd == null || user.currentPeriodEnd > Date.now()),
+  )
   const [error, setError] = useState('')
   const [busy, setBusy] = useState<'month' | 'year' | 'portal' | null>(null)
 
@@ -72,7 +81,7 @@ export function PricingCards() {
           {PLANS.monthly.searchesPerMonth} monthly hunts.
         </p>
       )}
-      {isSignedIn && (
+      {isSignedIn && subscribed && (
         <button
           type="button"
           onClick={portal}
