@@ -1,4 +1,3 @@
-//
 import { CONTINENTS, isTravelThemeId, SEARCH_HORIZON_MONTHS } from './constants'
 import type { SearchMode, SearchRequest, TripType } from './types'
 
