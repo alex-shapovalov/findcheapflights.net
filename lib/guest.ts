@@ -19,10 +19,11 @@ export async function getGuestId() {
   return id
 }
 
-export async function guestQuota(guestId: string, ip: string) {
-  const used = await getGuestUsage(guestId)
-  const ipUsed = await getFreeIpUsage(ip)
-  const paywalled = used >= FREE_SEARCH_LIMIT || ipUsed >= FREE_IP_DAILY_LIMIT
+export async function freeQuota(guestId: string, ip: string, lifetimeUsed = 0) {
+  const used = Math.max(lifetimeUsed, await getGuestUsage(guestId))
+  const paywalled =
+    used >= FREE_SEARCH_LIMIT ||
+    (await getFreeIpUsage(ip)) >= FREE_IP_DAILY_LIMIT
   return {
     lifetimeUsed: used,
     remaining: paywalled ? 0 : Math.max(0, FREE_SEARCH_LIMIT - used),
@@ -30,19 +31,25 @@ export async function guestQuota(guestId: string, ip: string) {
   }
 }
 
+export async function guestQuota(guestId: string, ip: string) {
+  return freeQuota(guestId, ip)
+}
+
 export async function applyGuestUsageToUser(
   convex: Awaited<ReturnType<typeof getAuthedConvex>>,
   lifetimeUsed: number,
   subscribed: boolean,
 ) {
-  if (subscribed || lifetimeUsed >= FREE_SEARCH_LIMIT) return lifetimeUsed
   const guestId = await getGuestId()
-  const used = await getGuestUsage(guestId)
-  if (used < FREE_SEARCH_LIMIT) return lifetimeUsed
+  const guestUsed = await getGuestUsage(guestId)
+  const used = Math.max(lifetimeUsed, guestUsed)
+  if (subscribed) return used
+  if (lifetimeUsed >= FREE_SEARCH_LIMIT) return used
+  if (guestUsed < FREE_SEARCH_LIMIT) return used
   try {
     await convex.mutation(api.users.consumeFreeSearch, {})
-    return lifetimeUsed + 1
+    return Math.max(lifetimeUsed + 1, guestUsed)
   } catch {
-    return Math.max(lifetimeUsed, FREE_SEARCH_LIMIT)
+    return Math.max(used, FREE_SEARCH_LIMIT)
   }
 }

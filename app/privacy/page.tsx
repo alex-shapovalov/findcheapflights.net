@@ -27,10 +27,10 @@ export default function PrivacyPage() {
           <li>
             <strong>Search data.</strong> The criteria you submit (airports,
             continent, trip type, date window, stay length, price bounds, theme)
-            plus the report we generate and its status, so you can revisit it
-            in your history. Signed-in searches are stored in our database.
-            Guest searches are sent to the model to run and are not saved to
-            your history.
+            plus the report we generate and its status, so you can revisit it in
+            your history. Signed-in searches are stored in our database. Guest
+            searches are sent to the model to run and are not saved to your
+            history.
           </li>
           <li>
             <strong>Billing data.</strong> Your subscription status, plan
@@ -129,15 +129,15 @@ export default function PrivacyPage() {
             guest identifier or IP address for rate limiting.
           </li>
           <li>
-            <strong>Stripe</strong>: checkout, card processing, and
-            subscription management.
+            <strong>Stripe</strong>: checkout, card processing, and subscription
+            management.
           </li>
           <li>
             <strong>OpenRouter</strong> and the underlying model provider: they
-            receive your trip criteria in order to run the search. We do not
-            use your prompts to train a model of our own. We cannot control
-            whether those providers log requests or use them under their own
-            terms. Do not put sensitive personal details into free-text fields.
+            receive your trip criteria in order to run the search. We do not use
+            your prompts to train a model of our own. We cannot control whether
+            those providers log requests or use them under their own terms. Do
+            not put sensitive personal details into free-text fields.
           </li>
           <li>
             <strong>Vercel</strong>: hosting, edge routing, request logs, and
@@ -155,12 +155,11 @@ export default function PrivacyPage() {
           Account records and signed-in search history stay until you ask us to
           delete them. They do not expire on their own. Rate-limit counters
           expire automatically: daily free-search counters within about 36
-          hours, monthly Pro counters within about 40 days, and guest
-          counters within 90 days. After a deletion request we remove your
-          Clerk login, Convex user record, and search history. Stripe and other
-          providers may keep billing or log records as long as their own rules
-          and tax law require. Provider logs follow each provider&apos;s
-          retention schedule.
+          hours, monthly Pro counters within about 40 days, and guest counters
+          within 90 days. After a deletion request we remove your Clerk login,
+          Convex user record, and search history. Stripe and other providers may
+          keep billing or log records as long as their own rules and tax law
+          require. Provider logs follow each provider&apos;s retention schedule.
         </p>
       </LegalSection>
 
@@ -170,16 +169,16 @@ export default function PrivacyPage() {
           your account and personal data, email{' '}
           <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> from the
           address on the account. We will verify the request, then delete your
-          Clerk login, Convex user record, and search history, and ask Stripe
-          to close the customer record where that is allowed. Copies held by
+          Clerk login, Convex user record, and search history, and ask Stripe to
+          close the customer record where that is allowed. Copies held by
           providers for tax, fraud, or legal reasons may remain.
         </p>
         <p>
           Depending on where you live, you may also have the right to access,
-          correct, export, or delete your personal data, or to object to
-          certain processing. Email the same address and we will handle the
-          request. You can also block cookies in your browser, though sign-in
-          and quota tracking will stop working.
+          correct, export, or delete your personal data, or to object to certain
+          processing. Email the same address and we will handle the request. You
+          can also block cookies in your browser, though sign-in and quota
+          tracking will stop working.
         </p>
       </LegalSection>
 
@@ -195,9 +194,9 @@ export default function PrivacyPage() {
       <LegalSection heading="Children">
         <p>
           You must be at least 18 to use the service or subscribe. The service
-          is not intended for children under 13, and we do not knowingly
-          collect their data. If you believe a child has given us information,
-          email us and we will delete it.
+          is not intended for children under 13, and we do not knowingly collect
+          their data. If you believe a child has given us information, email us
+          and we will delete it.
         </p>
       </LegalSection>
 

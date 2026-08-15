@@ -10,8 +10,8 @@ import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
   indexRobots,
-  shareImage,
   SITE_NAME,
+  shareImage,
   TITLE_TEMPLATE,
 } from '@/lib/seo'
 import { parseTheme, THEME_STORAGE_KEY } from '@/lib/theme'

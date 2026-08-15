@@ -12,10 +12,8 @@ import { applyGuestUsageToUser, getGuestId } from '@/lib/guest'
 import { streamFlightHunt } from '@/lib/openrouter'
 import {
   consumeBurst,
-  consumeFreeIpHunt,
   consumeGuestHunt,
   consumeSubscriberSearch,
-  refundFreeIpHunt,
   refundGuestHunt,
   refundSubscriberSearch,
 } from '@/lib/redis'
@@ -122,13 +120,14 @@ export async function POST(request: Request) {
   } else if (lifetimeUsed >= FREE_SEARCH_LIMIT) {
     return paywallResponse()
   } else {
-    const freeIp = await consumeFreeIpHunt(ip)
-    if (!freeIp.allowed) return paywallResponse()
+    const guestId = await getGuestId()
+    const consumed = await consumeGuestHunt(guestId, ip)
+    if (!consumed.allowed) return paywallResponse()
     try {
       await convex.mutation(api.users.consumeFreeSearch, {})
-      refundReservation = () => refundFreeIpHunt(ip)
+      refundReservation = () => refundGuestHunt(guestId, ip)
     } catch (error) {
-      await refundFreeIpHunt(ip).catch(() => undefined)
+      await refundGuestHunt(guestId, ip).catch(() => undefined)
       if (error instanceof Error && error.message.includes('PAYWALL')) {
         return paywallResponse()
       }

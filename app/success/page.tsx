@@ -42,7 +42,9 @@ export default async function SuccessPage({
         You&apos;re in
       </p>
       <h1 className="mt-3 font-display text-4xl sm:text-5xl">Pro is active.</h1>
-      <p className="mt-4 text-mute">You now have 100 live fare hunts per month.</p>
+      <p className="mt-4 text-mute">
+        You now have 100 live fare hunts per month.
+      </p>
       <Link
         href="/"
         className="mt-8 inline-flex rounded-full bg-gold px-6 py-3 font-medium text-on-gold"

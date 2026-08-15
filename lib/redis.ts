@@ -75,9 +75,17 @@ return 0
   )
 }
 
+function asCount(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return parsed
+  }
+  return 0
+}
+
 async function usageOf(key: string) {
-  const used = await getRedis().get<number>(key)
-  return typeof used === 'number' ? used : 0
+  return asCount(await getRedis().get<number | string>(key))
 }
 
 function utcDay() {
@@ -172,19 +180,4 @@ export async function consumeGuestHunt(guestId: string, ip: string) {
 
 export async function refundGuestHunt(guestId: string, ip: string) {
   await refundBudgets([guestKey(guestId), freeIpKey(ip)])
-}
-
-export async function consumeFreeIpHunt(ip: string) {
-  const { allowed } = await consumeBudgets([
-    {
-      key: freeIpKey(ip),
-      limit: FREE_IP_DAILY_LIMIT,
-      ttlSeconds: DAILY_TTL_SECONDS,
-    },
-  ])
-  return { allowed }
-}
-
-export async function refundFreeIpHunt(ip: string) {
-  await refundBudgets([freeIpKey(ip)])
 }

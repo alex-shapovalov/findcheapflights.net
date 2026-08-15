@@ -1,14 +1,14 @@
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { hasActiveAccess, refreshBilling } from '@/lib/billing'
-import {
-  FREE_IP_DAILY_LIMIT,
-  FREE_SEARCH_LIMIT,
-  QUOTA_IP_BURST_LIMIT,
-  SUBSCRIBER_MONTHLY_LIMIT,
-} from '@/lib/constants'
+import { QUOTA_IP_BURST_LIMIT, SUBSCRIBER_MONTHLY_LIMIT } from '@/lib/constants'
 import { api, getAuthedConvex } from '@/lib/convex-server'
-import { applyGuestUsageToUser, getGuestId, guestQuota } from '@/lib/guest'
-import { consumeBurst, getFreeIpUsage, getSubscriberUsage } from '@/lib/redis'
+import {
+  applyGuestUsageToUser,
+  freeQuota,
+  getGuestId,
+  guestQuota,
+} from '@/lib/guest'
+import { consumeBurst, getSubscriberUsage } from '@/lib/redis'
 import { clientIp } from '@/lib/request'
 
 export async function GET(request: Request) {
@@ -44,25 +44,28 @@ export async function GET(request: Request) {
   })
   const profile = await refreshBilling(await convex.query(api.users.me, {}))
   const subscribed = hasActiveAccess(profile)
-  let lifetimeUsed = profile?.lifetimeSearchCount ?? 0
-  lifetimeUsed = await applyGuestUsageToUser(convex, lifetimeUsed, subscribed)
+  const lifetimeUsed = await applyGuestUsageToUser(
+    convex,
+    profile?.lifetimeSearchCount ?? 0,
+    subscribed,
+  )
   const monthlyUsed = subscribed ? await getSubscriberUsage(userId) : 0
-  const freeIpExhausted =
-    !subscribed && (await getFreeIpUsage(ip)) >= FREE_IP_DAILY_LIMIT
-  const paywalled =
-    !subscribed && (lifetimeUsed >= FREE_SEARCH_LIMIT || freeIpExhausted)
-  const remaining = subscribed
-    ? Math.max(0, SUBSCRIBER_MONTHLY_LIMIT - monthlyUsed)
-    : Math.max(0, FREE_SEARCH_LIMIT - lifetimeUsed)
+  const quota = subscribed
+    ? {
+        remaining: Math.max(0, SUBSCRIBER_MONTHLY_LIMIT - monthlyUsed),
+        paywalled: false,
+        lifetimeUsed,
+      }
+    : await freeQuota(await getGuestId(), ip, lifetimeUsed)
 
   return Response.json({
     signedIn: true,
     subscribed,
-    lifetimeUsed,
+    lifetimeUsed: quota.lifetimeUsed,
     monthlyUsed,
     monthlyLimit: SUBSCRIBER_MONTHLY_LIMIT,
-    remaining: paywalled ? 0 : remaining,
-    paywalled,
+    remaining: quota.remaining,
+    paywalled: quota.paywalled,
     interval: profile?.subscriptionInterval ?? null,
   })
 }

@@ -64,18 +64,9 @@ export function SearchForm() {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    fetch('/api/me')
-      .then(response => (response.ok ? response.json() : null))
-      .then((next: QuotaState | null) => {
-        if (cancelled || !next) return
-        setQuota(next)
-        setPaywall(next.paywalled)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    void isSignedIn
+    void refreshQuota()
+  }, [isSignedIn, refreshQuota])
 
   useEffect(() => {
     if (status !== 'running') return
@@ -366,7 +357,7 @@ export function SearchForm() {
                 ? `Free hunt used, purchase Pro to unlock ${SUBSCRIBER_MONTHLY_LIMIT} searches/month`
                 : `${quota.remaining} free hunt remaining`}
           </p>
-          {isSignedIn || (!quota.paywalled && quota.remaining > 0) ? (
+          {quota.subscribed || (!quota.paywalled && quota.remaining > 0) ? (
             <button
               type="submit"
               disabled={status === 'running'}
@@ -377,13 +368,21 @@ export function SearchForm() {
               )}
               {status === 'running' ? 'Hunting live fares...' : 'Hunt fares'}
             </button>
+          ) : isSignedIn ? (
+            <button
+              type="button"
+              onClick={() => startCheckout('month')}
+              className="w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto"
+            >
+              Get Pro
+            </button>
           ) : (
             <SignInButton mode="modal">
               <button
                 type="button"
                 className="w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto"
               >
-                Sign in to hunt
+                Sign in to unlock Pro
               </button>
             </SignInButton>
           )}

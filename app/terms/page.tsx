@@ -39,9 +39,9 @@ export default function TermsPage() {
           airline reservation systems.
         </p>
         <p>
-          Every result is a research summary that points you to where a fare
-          was listed. You book directly with the airline or online travel
-          agency and their terms apply to that booking.
+          Every result is a research summary that points you to where a fare was
+          listed. You book directly with the airline or online travel agency and
+          their terms apply to that booking.
         </p>
       </LegalSection>
 
@@ -61,8 +61,8 @@ export default function TermsPage() {
           Some features require an account, which is handled by our
           authentication provider. You are responsible for the accuracy of the
           information you provide, for activity under your account, and for
-          keeping access to your email and login credentials secure. You must
-          be at least 18 and able to form a binding contract where you live.
+          keeping access to your email and login credentials secure. You must be
+          at least 18 and able to form a binding contract where you live.
         </p>
       </LegalSection>
 
@@ -76,9 +76,9 @@ export default function TermsPage() {
             Pro is {usd(PLANS.monthly.amountUsd)} per month or{' '}
             {usd(PLANS.yearly.amountUsd)} per year and includes up to{' '}
             {SUBSCRIBER_MONTHLY_LIMIT} live searches per month. Monthly limits
-            reset at 00:00 UTC on the first of each month and unused searches
-            do not roll over. Listed prices
-            may not include taxes that Stripe collects.
+            reset at 00:00 UTC on the first of each month and unused searches do
+            not roll over. Listed prices may not include taxes that Stripe
+            collects.
           </li>
           <li>
             Subscriptions are processed by Stripe and renew automatically until
@@ -94,8 +94,8 @@ export default function TermsPage() {
           <li>
             Payments are generally non-refundable except where required by law,
             including any cooling-off or withdrawal rights that apply where you
-            live. If we cause a material failure of the service, email us and
-            we will refund or extend access.
+            live. If we cause a material failure of the service, email us and we
+            will refund or extend access.
           </li>
           <li>
             Prices and limits can change. We will give notice of changes that
@@ -103,8 +103,8 @@ export default function TermsPage() {
             renewal.
           </li>
           <li>
-            If we discontinue the service, your Pro access continues through
-            the period you already paid for, or we refund the unused portion.
+            If we discontinue the service, your Pro access continues through the
+            period you already paid for, or we refund the unused portion.
           </li>
         </ul>
       </LegalSection>
@@ -178,8 +178,8 @@ export default function TermsPage() {
       <LegalSection heading="Your responsibility">
         <p>
           You agree to cover losses we reasonably incur because you misused the
-          service, broke these terms, or violated the law, including claims
-          from third parties that arise from that conduct.
+          service, broke these terms, or violated the law, including claims from
+          third parties that arise from that conduct.
         </p>
       </LegalSection>
 
@@ -188,9 +188,9 @@ export default function TermsPage() {
           We may update these terms as the product changes. The &ldquo;last
           updated&rdquo; date above always reflects the current version. For
           material changes we will email account holders when we can. Price and
-          limit changes for an active subscription follow the notice-before-renewal
-          rule above. Continuing to use the site after a change means you
-          accept it.
+          limit changes for an active subscription follow the
+          notice-before-renewal rule above. Continuing to use the site after a
+          change means you accept it.
         </p>
       </LegalSection>
 
@@ -200,20 +200,20 @@ export default function TermsPage() {
           company. Until an entity is formed and this section is updated,
           disputes should be raised first by emailing{' '}
           <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. No
-          jurisdiction is named here yet, and this is not a choice of a
-          specific court or country&apos;s law.
+          jurisdiction is named here yet, and this is not a choice of a specific
+          court or country&apos;s law.
         </p>
       </LegalSection>
 
       <LegalSection heading="Other terms">
         <p>
-          These terms, together with the Privacy Policy, are the whole
-          agreement between you and us for the service. If a court finds a
-          part unenforceable, the rest still applies. You may not transfer
-          your account without our consent; we may transfer the service if the
+          These terms, together with the Privacy Policy, are the whole agreement
+          between you and us for the service. If a court finds a part
+          unenforceable, the rest still applies. You may not transfer your
+          account without our consent; we may transfer the service if the
           product changes hands. Sections that by their nature should survive
-          (including disclaimers, liability limits, and this section) remain
-          in effect after the service or your account ends.
+          (including disclaimers, liability limits, and this section) remain in
+          effect after the service or your account ends.
         </p>
       </LegalSection>
 
