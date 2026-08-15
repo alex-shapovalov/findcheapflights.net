@@ -6,7 +6,7 @@ import type { StoryEntry } from './story'
 export const SITE_NAME = APP_NAME
 export const SITE_DOMAIN = 'findcheapflights.ai'
 
-export const DEFAULT_TITLE = 'Find Cheap Flights: search live cheap fares'
+export const DEFAULT_TITLE = 'Find Cheap Flights: Search for live cheap fares'
 export const DEFAULT_DESCRIPTION =
   'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
 
