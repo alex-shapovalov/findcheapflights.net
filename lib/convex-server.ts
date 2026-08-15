@@ -4,7 +4,7 @@ import { api } from '../convex/_generated/api'
 
 export function convexUrl() {
   const url = process.env.NEXT_PUBLIC_CONVEX_URL
-  if (!url) throw new Error('NEXT_PUBLIC_CONVEX_URL is not configured')
+  if (!url) throw new Error('Convex error: Convex is not configured 205')
   return url
 }
 
@@ -15,7 +15,7 @@ export function getConvexClient() {
 export function convexServerSecret() {
   const secret = process.env.CONVEX_SERVER_SECRET
   if (!secret) {
-    throw new Error('CONVEX_SERVER_SECRET is not configured')
+    throw new Error('Convex error: Convex server is not configured 206')
   }
   return secret
 }

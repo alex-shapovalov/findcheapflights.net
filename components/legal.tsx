@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { LEGAL_UPDATED } from '@/lib/constants'
 
 export function LegalPage({
   eyebrow,
@@ -18,7 +17,7 @@ export function LegalPage({
       <h1 className="mt-3 font-display text-4xl tracking-tight sm:text-5xl">
         {title}
       </h1>
-      <p className="mt-4 text-sm text-mute">Last updated {LEGAL_UPDATED}</p>
+      <p className="mt-4 text-sm text-mute">Last updated August 15, 2026</p>
       <p className="mt-6 text-mute">{intro}</p>
       <div className="mt-10 flex flex-col gap-8">{children}</div>
     </div>

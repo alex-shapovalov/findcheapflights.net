@@ -6,7 +6,6 @@ export const MAX_RESULT_CHARS = 60_000
 export const MAX_ERROR_CHARS = 2_000
 export const MAX_THEME_CHARS = 40
 export const MAX_AIRPORTS = 12
-
 export const WRITE_BUDGET = 60
 export const WRITE_WINDOW_MS = 60 * 60 * 1000
 

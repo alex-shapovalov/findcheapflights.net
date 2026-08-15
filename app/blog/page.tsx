@@ -4,9 +4,9 @@ import { formatBlogDate, getBlogPosts } from '@/lib/blog'
 import { blogIndexJsonLd, pageMetadata } from '@/lib/seo'
 
 export const metadata = pageMetadata({
-  title: 'Blog',
+  title: 'Find Cheap Flights for free: Blogs, Guides, and Tips',
   description:
-    'Guides on how to find cheap flights: nearby airports, flexible dates, and live fare hunting on findcheapflights.ai.',
+    'Find out how to find cheap flights for free: nearby airports, flexible dates, and live fare hunting on findcheapflights.ai.',
   path: '/blog',
 })
 
@@ -21,8 +21,8 @@ export default function BlogPage() {
         Blog
       </h1>
       <p className="mt-4 text-mute">
-        How to find cheap flights — nearby airports, flexible dates, and hunts
-        against live public fares. One URL per guide.
+        How to find cheap flights, nearby airports, flexible dates, and fare
+        searches of live public fares.
       </p>
       {posts.length === 0 ? (
         <p className="mt-12 text-mute">No posts yet.</p>

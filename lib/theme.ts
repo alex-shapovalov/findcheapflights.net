@@ -96,6 +96,8 @@ export function clerkAppearance(theme: Theme) {
         borderColor: colors.line,
       },
       formFieldLabel: { color: colors.foam },
+      profileSection__connectedAccounts: { display: 'none' },
+      profileSection__danger: { display: 'none' },
     },
   }
 }

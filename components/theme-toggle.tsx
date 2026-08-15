@@ -23,7 +23,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label={`Switch to ${next} mode`}
-      className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-mute hover:border-gold hover:text-gold"
+      className="grid h-10 w-10 shrink-0 place-items-center text-mute hover:text-gold"
     >
       {theme === 'dark' ? (
         <Sun className="h-4 w-4" />

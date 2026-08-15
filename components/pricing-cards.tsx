@@ -68,8 +68,7 @@ export function PricingCards() {
               Sign in
             </button>
           </SignInButton>{' '}
-          first — checkout needs an account so we can attach your 25 daily
-          hunts.
+          first. Checkout needs an account so we can attach your 25 daily hunts.
         </p>
       )}
       {isSignedIn && (

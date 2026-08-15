@@ -116,15 +116,25 @@ button {
   color-scheme: inherit;
 }
 
-.cl-cardBox,
-.cl-modalContent,
-.cl-rootBox {
+.cl-signIn-root,
+.cl-signUp-root,
+.cl-signIn-root .cl-cardBox,
+.cl-signUp-root .cl-cardBox,
+.cl-modalContent:has(.cl-signIn-root),
+.cl-modalContent:has(.cl-signUp-root) {
   width: min(100%, 25rem) !important;
   max-width: calc(100vw - 1.5rem) !important;
 }
 
+.cl-userProfile-root,
+.cl-userProfile-root .cl-cardBox,
+.cl-modalContent:has(.cl-userProfile-root) {
+  width: min(100%, 55rem) !important;
+  max-width: calc(100vw - 1.5rem) !important;
+}
+
 .cl-modalContent {
-  max-height: min(90dvh, 42rem);
+  max-height: min(90dvh, 48rem);
   overflow-y: auto;
 }
 

@@ -215,7 +215,7 @@ GOOD ENOUGH (always emit one of these if you lack a token):
 - https://www.kayak.com/flights/CLT-LHR/2026-10-14/2026-10-21
 - https://www.skyscanner.com/transport/flights/clt/lhr/261014/261021/
 
-INVALID (never):
+INVALID (NEVER USE):
 - https://www.cheapflights.com/flights-to-europe/atlanta/
 - https://www.priceline.com/flight-routes/en-us/ATL/ZZEU00/flights-from-atlanta-to-europe.ssp
 - https://flynorse.com/en-US/flights-from-New-York-to-Rome

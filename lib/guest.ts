@@ -4,20 +4,16 @@ import { FREE_IP_DAILY_LIMIT, FREE_SEARCH_LIMIT } from './constants'
 import type { getAuthedConvex } from './convex-server'
 import { getFreeIpUsage, getGuestUsage } from './redis'
 
-const GUEST_COOKIE = 'fcf_guest'
-const GUEST_MAX_AGE = 60 * 60 * 24 * 90
-const GUEST_ID = /^[0-9a-f-]{36}$/i
-
 export async function getGuestId() {
   const store = await cookies()
-  const existing = store.get(GUEST_COOKIE)?.value
-  if (existing && GUEST_ID.test(existing)) return existing
+  const existing = store.get('fcf_guest')?.value
+  if (existing && /^[0-9a-f-]{36}$/i.test(existing)) return existing
   const id = crypto.randomUUID()
-  store.set(GUEST_COOKIE, id, {
+  store.set('fcf_guest', id, {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: GUEST_MAX_AGE,
+    maxAge: 60 * 60 * 24 * 90,
     path: '/',
   })
   return id

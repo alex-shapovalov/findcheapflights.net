@@ -17,7 +17,7 @@ export function normalizeSubscriptionStatus(
 export function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY
   if (!key) {
-    throw new Error('STRIPE_SECRET_KEY is not configured')
+    throw new Error('Stripe error: Stripe secret key is not configured 210')
   }
   if (!stripeClient) {
     stripeClient = new Stripe(key)
@@ -37,14 +37,12 @@ export function priceIdForInterval(interval: 'month' | 'year') {
   if (!id) {
     throw new Error(
       interval === 'year'
-        ? 'STRIPE_PRICE_YEARLY is not configured'
-        : 'STRIPE_PRICE_MONTHLY is not configured',
+        ? 'Stripe error: Stripe price yearly is not configured 211'
+        : 'Stripe error: Stripe price monthly is not configured 212',
     )
   }
   return id
 }
-
-const INTERVALS = new Set<string>(['day', 'week', 'month', 'year'])
 
 export type SubscriptionInterval = 'day' | 'week' | 'month' | 'year'
 
@@ -52,9 +50,14 @@ export function intervalOf(
   subscription: Stripe.Subscription,
 ): SubscriptionInterval | undefined {
   const interval = subscription.items.data[0]?.price.recurring?.interval
-  return interval && INTERVALS.has(interval)
-    ? (interval as SubscriptionInterval)
-    : undefined
+  if (
+    interval === 'day' ||
+    interval === 'week' ||
+    interval === 'month' ||
+    interval === 'year'
+  ) {
+    return interval as SubscriptionInterval
+  }
 }
 
 export function periodEndMs(subscription: Stripe.Subscription) {

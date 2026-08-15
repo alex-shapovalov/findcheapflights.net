@@ -12,7 +12,10 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as {
     interval?: string
   } | null
-  const interval = body?.interval === 'year' ? 'year' : 'month'
+  const interval = body?.interval
+  if (interval !== 'month' && interval !== 'year') {
+    return Response.json({ error: 'Invalid interval.' }, { status: 400 })
+  }
   const convex = await getAuthedConvex()
   const clerkUser = await currentUser()
   await convex.mutation(api.users.ensure, {

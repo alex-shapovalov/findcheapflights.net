@@ -31,7 +31,9 @@ type Budget = {
   ttlSeconds: number
 }
 
-const CONSUME_SCRIPT = `
+async function consumeBudgets(budgets: Budget[]) {
+  const blockedAt = await getRedis().eval<(number | string)[], number>(
+    `
 for i = 1, #KEYS do
   local limit = tonumber(ARGV[(i - 1) * 2 + 1])
   local ttl = tonumber(ARGV[(i - 1) * 2 + 2])
@@ -48,21 +50,7 @@ for i = 1, #KEYS do
   end
 end
 return 0
-`
-
-const REFUND_SCRIPT = `
-for i = 1, #KEYS do
-  local current = tonumber(redis.call('GET', KEYS[i]) or '0')
-  if current > 0 then
-    redis.call('DECR', KEYS[i])
-  end
-end
-return 0
-`
-
-async function consumeBudgets(budgets: Budget[]) {
-  const blockedAt = await getRedis().eval<(number | string)[], number>(
-    CONSUME_SCRIPT,
+`,
     budgets.map(budget => budget.key),
     budgets.flatMap(budget => [budget.limit, budget.ttlSeconds]),
   )
@@ -71,7 +59,19 @@ async function consumeBudgets(budgets: Budget[]) {
 
 async function refundBudgets(keys: string[]) {
   if (keys.length === 0) return
-  await getRedis().eval<never[], number>(REFUND_SCRIPT, keys, [])
+  await getRedis().eval<never[], number>(
+    `
+for i = 1, #KEYS do
+  local current = tonumber(redis.call('GET', KEYS[i]) or '0')
+  if current > 0 then
+    redis.call('DECR', KEYS[i])
+  end
+end
+return 0
+`,
+    keys,
+    [],
+  )
 }
 
 async function usageOf(key: string) {

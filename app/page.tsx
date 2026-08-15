@@ -1,7 +1,5 @@
-import Link from 'next/link'
 import { JsonLd } from '@/components/json-ld'
 import { SearchForm } from '@/components/search-form'
-import { formatBlogDate, getBlogPosts } from '@/lib/blog'
 import {
   DEFAULT_DESCRIPTION,
   faqJsonLd,
@@ -11,7 +9,6 @@ import {
   softwareJsonLd,
   websiteJsonLd,
 } from '@/lib/seo'
-import { formatStoryDate, getStoryEntries, storyTagLabel } from '@/lib/story'
 
 export const metadata = pageMetadata({
   description: DEFAULT_DESCRIPTION,
@@ -19,9 +16,6 @@ export const metadata = pageMetadata({
 })
 
 export default function HomePage() {
-  const latestStory = getStoryEntries().slice(0, 2)
-  const latestPosts = getBlogPosts().slice(0, 3)
-
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-16">
       <JsonLd
@@ -41,7 +35,9 @@ export default function HomePage() {
           <span className="block text-gold">Lock-in the best deals.</span>
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-mute">
-          Hunt verified cheap fares; even if you don't know where you want to go yet. We hunt for the trips you didn't know you could afford, and dig deep to find the deals that you would miss in a normal search.
+          Hunt verified cheap fares; even if you don't know where you want to go
+          yet. We hunt for the trips you didn't know you could afford, and dig
+          deep to find the deals that you would miss in a normal search.
         </p>
       </section>
       <SearchForm />
@@ -66,8 +62,8 @@ export default function HomePage() {
           <li>
             <p className="font-medium text-foam">3. Read live public fares</p>
             <p className="mt-1">
-              We do not sit on a GDS. We search live public
-              fare pages and write a report so you can book yourself.
+              We do not sit on a GDS. We search live public fare pages and write
+              a report so you can book yourself.
             </p>
           </li>
         </ol>

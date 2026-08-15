@@ -5,7 +5,7 @@ import { DEFAULT_DESCRIPTION } from '@/lib/seo'
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: APP_NAME,
-    short_name: 'Cheap Flights',
+    short_name: 'Find Cheap Flights',
     description: DEFAULT_DESCRIPTION,
     start_url: '/',
     id: SITE_URL,
@@ -17,11 +17,6 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         src: '/icon',
         sizes: '32x32',
-        type: 'image/png',
-      },
-      {
-        src: '/apple-icon',
-        sizes: '180x180',
         type: 'image/png',
       },
     ],

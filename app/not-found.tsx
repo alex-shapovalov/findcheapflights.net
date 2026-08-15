@@ -12,7 +12,7 @@ export default function NotFound() {
         Page not found.
       </h1>
       <p className="mt-4 text-mute">
-        That URL is not a cheap-flight hunt we know about.
+        That URL is not a cheap flight we know about.
       </p>
       <Link
         href="/"

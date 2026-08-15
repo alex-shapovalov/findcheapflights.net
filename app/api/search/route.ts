@@ -39,17 +39,12 @@ function tooManyRequests(message: string) {
   return Response.json({ error: 'rate_limited', message }, { status: 429 })
 }
 
-const GENERIC_SEARCH_ERROR =
-  'Something went wrong running this search. Please try again.'
-const TIMEOUT_SEARCH_ERROR =
-  'This search ran too long and stopped before a report came back. Please try again.'
-
 function publicSearchError(error: unknown) {
   const name = error instanceof Error ? error.name : ''
   if (name === 'TimeoutError' || name === 'AbortError') {
-    return TIMEOUT_SEARCH_ERROR
+    return 'This search ran too long and stopped before a report came back. Please try again.'
   }
-  return GENERIC_SEARCH_ERROR
+  return 'Something went wrong running this search. Please try again.'
 }
 
 export async function POST(request: Request) {
@@ -188,7 +183,9 @@ function huntResponse(
             .catch(() => undefined)
           return
         }
-        await hooks.onComplete?.(report || 'No fare report was returned.')
+        await hooks.onComplete?.(
+          report || 'No fare report was returned. Try again.',
+        )
         controller.close()
       } catch (error) {
         console.error('Fare hunt failed', error)

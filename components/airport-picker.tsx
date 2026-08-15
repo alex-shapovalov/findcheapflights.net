@@ -93,38 +93,37 @@ export function AirportPicker({ label, values, onChange, placeholder }: Props) {
         </div>
       </div>
       {open && (
-        <ul
+        <div
           id={`${inputId}-listbox`}
           role="listbox"
           className="max-h-60 overflow-auto rounded-xl border border-line bg-panel shadow-xl"
         >
           {results.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-mute">
+            <div className="px-3 py-2 text-sm text-mute">
               No matching airports
-            </li>
+            </div>
           ) : (
             results.map(airport => (
-              <li key={airport.iata}>
-                <button
-                  type="button"
-                  onClick={() => add(airport)}
-                  className={cn(
-                    'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-panel-2',
-                    values.includes(airport.iata) && 'text-mute',
-                  )}
-                >
-                  <span>
-                    <span className="font-medium text-gold">
-                      {airport.iata}
-                    </span>{' '}
-                    {formatAirport(airport)}
-                  </span>
-                  <span className="text-xs text-mute">{airport.country}</span>
-                </button>
-              </li>
+              <button
+                key={airport.iata}
+                type="button"
+                role="option"
+                aria-selected={values.includes(airport.iata)}
+                onClick={() => add(airport)}
+                className={cn(
+                  'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-panel-2',
+                  values.includes(airport.iata) && 'text-mute',
+                )}
+              >
+                <span>
+                  <span className="font-medium text-gold">{airport.iata}</span>{' '}
+                  {formatAirport(airport)}
+                </span>
+                <span className="text-xs text-mute">{airport.country}</span>
+              </button>
             ))
           )}
-        </ul>
+        </div>
       )}
     </div>
   )

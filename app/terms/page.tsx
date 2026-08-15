@@ -3,18 +3,26 @@ import { LegalPage, LegalSection } from '@/components/legal'
 import {
   CONTACT_EMAIL,
   FREE_SEARCH_LIMIT,
+  PLANS,
   SUBSCRIBER_DAILY_LIMIT,
 } from '@/lib/constants'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata = pageMetadata({
-  title: 'Terms of Service',
+  title: 'Find Cheap Flights: Terms of Service',
   description:
     'The terms that govern your use of findcheapflights.ai, including plan limits, billing, acceptable use, and fare accuracy disclaimers.',
   path: '/terms',
 })
 
+function usd(amount: number) {
+  return `$${amount.toFixed(2)}`
+}
+
 export default function TermsPage() {
+  const freeSearchLabel =
+    FREE_SEARCH_LIMIT === 1 ? 'free live search' : 'free live searches'
+
   return (
     <LegalPage
       eyebrow="Legal"
@@ -23,17 +31,17 @@ export default function TermsPage() {
     >
       <LegalSection heading="What the service does">
         <p>
-          Find Cheap Flights is a fare research tool. You describe a trip —
-          airports, a date window, a price ceiling — and a language model with
+          Find Cheap Flights is a fare research tool. You describe a trip
+          (airports, a date window, a price ceiling) and a language model with
           web search reads publicly available fare pages and reports what it
-          finds. We are not a travel agency, an airline, or a booking platform,
-          and we do not use a GDS.
+          finds. We are not a travel agency, an airline, or a booking platform.
+          We do not sell tickets, take payment for travel, or book through
+          airline reservation systems.
         </p>
         <p>
-          We never sell tickets or take payment for travel. Every result is a
-          research summary that points you to where a fare was listed. You book
-          directly with the airline or online travel agency and their terms
-          apply to that booking.
+          Every result is a research summary that points you to where a fare
+          was listed. You book directly with the airline or online travel
+          agency and their terms apply to that booking.
         </p>
       </LegalSection>
 
@@ -53,25 +61,29 @@ export default function TermsPage() {
           Some features require an account, which is handled by our
           authentication provider. You are responsible for the accuracy of the
           information you provide, for activity under your account, and for
-          keeping access to your email and login credentials secure. You must be
-          old enough to form a binding contract where you live.
+          keeping access to your email and login credentials secure. You must
+          be at least 18 and able to form a binding contract where you live.
         </p>
       </LegalSection>
 
       <LegalSection heading="Free searches, plans, and billing">
         <ul className="flex flex-col gap-2">
           <li>
-            Each visitor gets {FREE_SEARCH_LIMIT} free live search. Free usage
+            Each visitor gets {FREE_SEARCH_LIMIT} {freeSearchLabel}. Free usage
             is also limited per IP address per day to prevent abuse.
           </li>
           <li>
-            Pro is $11.99 per month or $119.99 per year and includes up to{' '}
+            Pro is {usd(PLANS.monthly.amountUsd)} per month or{' '}
+            {usd(PLANS.yearly.amountUsd)} per year and includes up to{' '}
             {SUBSCRIBER_DAILY_LIMIT} live searches per day. Daily limits reset
-            at 00:00 UTC and unused searches do not roll over.
+            at 00:00 UTC and unused searches do not roll over. Listed prices
+            may not include taxes that Stripe collects.
           </li>
           <li>
             Subscriptions are processed by Stripe and renew automatically until
             you cancel. You authorize the recurring charge when you subscribe.
+            If a renewal payment fails, Pro access may pause until payment
+            succeeds.
           </li>
           <li>
             You can cancel at any time. Cancellation stops future renewals and
@@ -80,13 +92,18 @@ export default function TermsPage() {
           </li>
           <li>
             Payments are generally non-refundable except where required by law,
-            but if something goes wrong on our end, email us and we will make it
-            right.
+            including any cooling-off or withdrawal rights that apply where you
+            live. If we cause a material failure of the service, email us and
+            we will refund or extend access.
           </li>
           <li>
             Prices and limits can change. We will give notice of changes that
             affect an active subscription before they apply to your next
             renewal.
+          </li>
+          <li>
+            If we discontinue the service, your Pro access continues through
+            the period you already paid for, or we refund the unused portion.
           </li>
         </ul>
       </LegalSection>
@@ -114,8 +131,7 @@ export default function TermsPage() {
           </li>
         </ul>
         <p>
-          We may rate limit, suspend, or terminate access for any of the above,
-          and we may stop offering the service at any time.
+          We may rate limit, suspend, or terminate access for any of the above.
         </p>
       </LegalSection>
 
@@ -123,8 +139,8 @@ export default function TermsPage() {
         <p>
           You keep ownership of the trip criteria you enter. You grant us the
           limited right to process it in order to run your search, store your
-          history, and improve the product. The site itself — its name, design,
-          copy, and code — belongs to us, and search reports are for your own
+          history, and improve the product. The site itself (its name, design,
+          copy, and code) belongs to us, and search reports are for your own
           personal or internal use.
         </p>
       </LegalSection>
@@ -132,9 +148,10 @@ export default function TermsPage() {
       <LegalSection heading="Third parties">
         <p>
           We rely on providers for hosting, authentication, database, rate
-          limiting, payments, and model inference, and results link to airline
-          and travel agency sites we do not control. We are not responsible for
-          third-party content, availability, pricing, or conduct.
+          limiting, payments, analytics, and model inference, and results link
+          to airline and travel agency sites we do not control. We are not
+          responsible for third-party content, availability, pricing, or
+          conduct.
         </p>
       </LegalSection>
 
@@ -157,21 +174,45 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
+      <LegalSection heading="Your responsibility">
+        <p>
+          You agree to cover losses we reasonably incur because you misused the
+          service, broke these terms, or violated the law, including claims
+          from third parties that arise from that conduct.
+        </p>
+      </LegalSection>
+
       <LegalSection heading="Changes to these terms">
         <p>
           We may update these terms as the product changes. The &ldquo;last
-          updated&rdquo; date above always reflects the current version, and
-          continuing to use the site after a change means you accept it.
+          updated&rdquo; date above always reflects the current version. For
+          material changes we will email account holders when we can. Price and
+          limit changes for an active subscription follow the notice-before-renewal
+          rule above. Continuing to use the site after a change means you
+          accept it.
         </p>
       </LegalSection>
 
       <LegalSection heading="Governing law">
         <p>
-          Find Cheap Flights is currently operated by an individual rather than
-          a registered company, so no corporate entity or jurisdiction is named
-          here yet. Any dispute will be governed by the law of the place where
-          the operator resides, and this section will be updated once an entity
-          is formed.
+          Find Cheap Flights is operated by an individual, not a registered
+          company. Until an entity is formed and this section is updated,
+          disputes should be raised first by emailing{' '}
+          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. No
+          jurisdiction is named here yet, and this is not a choice of a
+          specific court or country&apos;s law.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Other terms">
+        <p>
+          These terms, together with the Privacy Policy, are the whole
+          agreement between you and us for the service. If a court finds a
+          part unenforceable, the rest still applies. You may not transfer
+          your account without our consent; we may transfer the service if the
+          product changes hands. Sections that by their nature should survive
+          (including disclaimers, liability limits, and this section) remain
+          in effect after the service or your account ends.
         </p>
       </LegalSection>
 

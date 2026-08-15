@@ -146,18 +146,24 @@ export function safeExternalUrl(value: string | undefined) {
   return isAllowedHost(parsed.hostname) ? value : undefined
 }
 
-const MARKETING_PATH =
-  /flights-from-[a-z]|flights-to-[a-z]|flight-routes|\/destinations\/|\/explore\/|\/inspire\/|\/anywhere\/|transport\/flights-from\//i
-
-const REGION_PATH =
-  /(?:^|\/)(?:europe|asia|africa|oceania|worldwide|international|south-america|north-america|anywhere)(?:\/|$|\.)|\/zz[a-z]{2}/i
-
 export function isMarketingBrowseUrl(value: string) {
   try {
     const parsed = new URL(value)
     const path = parsed.pathname
-    if (MARKETING_PATH.test(path)) return true
-    if (REGION_PATH.test(path)) return true
+    if (
+      /flights-from-[a-z]|flights-to-[a-z]|flight-routes|\/destinations\/|\/explore\/|\/inspire\/|\/anywhere\/|transport\/flights-from\//i.test(
+        path,
+      )
+    ) {
+      return true
+    }
+    if (
+      /(?:^|\/)(?:europe|asia|africa|oceania|worldwide|international|south-america|north-america|anywhere)(?:\/|$|\.)|\/zz[a-z]{2}/i.test(
+        path,
+      )
+    ) {
+      return true
+    }
     if (/\/routes\/[a-z0-9]{3}\/[a-z0-9]{3}\/?$/i.test(path)) return true
     if (
       /\/transport\/flights\/[a-z]{3}\/(?:anywhere|[a-z]{3})\/?$/i.test(path)

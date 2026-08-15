@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import type { BlogPost } from './blog'
-import { APP_NAME, SITE_URL } from './constants'
+import { APP_NAME, isCanonicalSite, SITE_URL } from './constants'
 import type { StoryEntry } from './story'
 
 export const SITE_NAME = APP_NAME
@@ -68,9 +68,7 @@ export const X_ROBOTS_INDEX =
 export const X_ROBOTS_NOINDEX = 'noindex, nofollow'
 
 export function xRobotsTag(pathname: string) {
-  const isPreview =
-    process.env.VERCEL_ENV != null && process.env.VERCEL_ENV !== 'production'
-  if (!isPreview && isIndexablePath(pathname)) {
+  if (isCanonicalSite && isIndexablePath(pathname)) {
     return X_ROBOTS_INDEX
   }
   return X_ROBOTS_NOINDEX

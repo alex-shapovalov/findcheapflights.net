@@ -2,7 +2,7 @@
 
 import { SignInButton, useUser } from '@clerk/nextjs'
 import { LoaderCircle } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchReport } from '@/components/search-report'
 import { nearbyAirports } from '@/lib/airports'
 import { cn } from '@/lib/cn'
@@ -54,9 +54,28 @@ export function SearchForm() {
   const [paywall, setPaywall] = useState(false)
   const outcomeRef = useRef<HTMLDivElement>(null)
 
+  const refreshQuota = useCallback(async () => {
+    const response = await fetch('/api/me')
+    if (!response.ok) return null
+    const next = (await response.json()) as QuotaState
+    setQuota(next)
+    setPaywall(next.paywalled)
+    return next
+  }, [])
+
   useEffect(() => {
-    refreshQuota()
-  }, [isSignedIn])
+    let cancelled = false
+    fetch('/api/me')
+      .then(response => (response.ok ? response.json() : null))
+      .then((next: QuotaState | null) => {
+        if (cancelled || !next) return
+        setQuota(next)
+        setPaywall(next.paywalled)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (status !== 'running') return
@@ -67,15 +86,6 @@ export function SearchForm() {
       block: 'start',
     })
   }, [status])
-
-  async function refreshQuota() {
-    const response = await fetch('/api/me')
-    if (!response.ok) return null
-    const next = (await response.json()) as QuotaState
-    setQuota(next)
-    setPaywall(next.paywalled)
-    return next
-  }
 
   function addNearby() {
     const extra = nearbyAirports(originAirports).map(airport => airport.iata)
@@ -388,7 +398,7 @@ export function SearchForm() {
                 Your free hunt is used
               </h2>
               <p className="mt-2 max-w-xl text-mute">
-                {`Pro includes 25 cheap flight hunts per day.`}
+                {'Pro includes 25 cheap flight hunts per day.'}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {isSignedIn ? (
