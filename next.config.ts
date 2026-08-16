@@ -16,13 +16,18 @@ const googleAnalyticsHosts = [
   'https://*.analytics.google.com',
 ].join(' ')
 
+const vercelInsightsHosts = [
+  'https://va.vercel-scripts.com',
+  'https://vitals.vercel-insights.com',
+].join(' ')
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkHosts} ${googleAnalyticsHosts} https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkHosts} ${googleAnalyticsHosts} ${vercelInsightsHosts} https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: https://img.clerk.com https://*.stripe.com ${googleAnalyticsHosts}`,
   "font-src 'self' data:",
-  `connect-src 'self' ${clerkHosts} ${googleAnalyticsHosts} https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud`,
+  `connect-src 'self' ${clerkHosts} ${googleAnalyticsHosts} ${vercelInsightsHosts} https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud`,
   `frame-src 'self' ${clerkHosts} https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://*.js.stripe.com`,
   "worker-src 'self' blob:",
   "object-src 'none'",
