@@ -10,13 +10,19 @@ const clerkHosts = [
   'https://accounts.findcheapflights.net',
 ].join(' ')
 
+const googleAnalyticsHosts = [
+  'https://*.googletagmanager.com',
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
+].join(' ')
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkHosts} https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${clerkHosts} ${googleAnalyticsHosts} https://challenges.cloudflare.com https://js.stripe.com https://*.js.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://img.clerk.com https://*.stripe.com",
+  `img-src 'self' data: blob: https://img.clerk.com https://*.stripe.com ${googleAnalyticsHosts}`,
   "font-src 'self' data:",
-  `connect-src 'self' ${clerkHosts} https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud`,
+  `connect-src 'self' ${clerkHosts} ${googleAnalyticsHosts} https://clerk-telemetry.com https://*.clerk-telemetry.com https://challenges.cloudflare.com https://api.stripe.com https://*.stripe.com https://*.convex.cloud wss://*.convex.cloud`,
   `frame-src 'self' ${clerkHosts} https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://*.js.stripe.com`,
   "worker-src 'self' blob:",
   "object-src 'none'",
