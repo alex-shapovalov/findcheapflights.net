@@ -1,6 +1,6 @@
 ---
-title: How to find cheap flights with a flexible search
-description: The more you can flex destination, airport, date, and even vibe, the lower the fare. Here is how to search broadly and let the prices pick the trip.
+title: Cheap Flights with a Flexible Search
+description: Flex destination, airport, date, and vibe to lower the fare. Here is how to search broadly and let the prices pick the trip on findcheapflights.ai.
 ---
 
 If there is one thing you take away from [how to find cheap flights](/blog/how-to-find-cheap-flights), let it be this: the more elements of your journey you can be flexible on (destination, airport, date, even “vibe”), the lower your price will be.

@@ -7,8 +7,7 @@ export const SEARCH_USER_BURST_LIMIT = 4
 export const QUOTA_IP_BURST_LIMIT = 60
 export const NEARBY_RADIUS_KM = 560
 export const SEARCH_HORIZON_MONTHS = 24
-export const APP_NAME =
-  'findcheapflights.ai | Find Cheap Flights anywhere in the world'
+export const APP_NAME = 'Find Cheap Flights'
 export const SITE_URL = 'https://findcheapflights.ai'
 export const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ??

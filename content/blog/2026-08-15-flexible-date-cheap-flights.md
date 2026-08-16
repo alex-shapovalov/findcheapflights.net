@@ -1,6 +1,6 @@
 ---
-title: How to plan around price instead of just weekends with flexible date flight search
-description: Fares do not move like a train schedule. Search a date range, read the calendar, and pick the cheap cluster instead of locking Friday–Sunday first.
+title: Flexible Date Search for Cheap Flights
+description: Fares do not move like a train schedule. Search a date range, read the calendar, and pick the cheap cluster instead of locking Friday to Sunday first.
 ---
 
 Most people begin their flight searches by putting in the precise weekend they want: out Friday after work, home Sunday evening. Seems normal, right? Like looking up a train schedule. The trouble is, fares do not move like a train schedule does. Even on a single nonstop route, at the same time of day, you might pay several hundred dollars extra simply for choosing a busier weekend.

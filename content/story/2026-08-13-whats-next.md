@@ -1,7 +1,7 @@
 ---
-title: What's next
+title: What's Next
 tag: next
-summary: Alerts, personalized onboarding, and a tighter read on whether a fare is actually bookable.
+summary: What is coming next on Find Cheap Flights: fare alerts, personalized onboarding, and a tighter read on whether a fare is actually bookable.
 ---
 
 Hi all, we just wanted to make a note about what is planned for the future. Suggestions? Contact us at [support@findcheapflights.ai](mailto:support@findcheapflights.ai).

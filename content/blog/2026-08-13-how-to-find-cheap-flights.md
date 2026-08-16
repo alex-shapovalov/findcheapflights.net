@@ -1,6 +1,6 @@
 ---
-title: How to find cheap flights without locking a city first
-description: Find cheap flights by hunting nearby airports, flexible dates, and a price ceiling — then booking the live fare yourself.
+title: Cheap Flights Without Locking a City
+description: Find cheap flights by hunting nearby airports, flexible dates, and a price ceiling, then book the live fare yourself on findcheapflights.ai.
 ---
 
 Most “cheap flight” tools ask you to pick a destination, a weekend, and two airports you already know. That is a timetable. The cheap inventory is usually sitting on a different day, out of a different airport, or in a city you had not named yet.

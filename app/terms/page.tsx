@@ -9,9 +9,9 @@ import {
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata = pageMetadata({
-  title: 'Find Cheap Flights — Terms of Service',
+  title: 'Terms of Service',
   description:
-    'The terms that govern your use of findcheapflights.ai, including plan limits, billing, acceptable use, and fare accuracy disclaimers.',
+    'These terms govern your use of Find Cheap Flights, including plan limits, billing, acceptable use, and fare accuracy on findcheapflights.ai.',
   path: '/terms',
 })
 

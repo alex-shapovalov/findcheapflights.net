@@ -3,9 +3,9 @@ import { PricingCards } from '@/components/pricing-cards'
 import { pageMetadata, pricingJsonLd } from '@/lib/seo'
 
 export const metadata = pageMetadata({
-  title: 'Find Cheap Flights — Pricing',
+  title: 'Pricing',
   description:
-    'Free trial of Find Cheap Flights, then Pro for $11.99/month or $119.99/year. 100 live fare searches a month on findcheapflights.ai.',
+    'Try Find Cheap Flights free, then go Pro for $11.99 a month or $119.99 a year. Get 100 live fare searches each month on findcheapflights.ai.',
   path: '/pricing',
 })
 

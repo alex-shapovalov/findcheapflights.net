@@ -4,9 +4,9 @@ import { noIndexMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = {
   ...noIndexMetadata,
-  title: 'Find Cheap Flights — Sign up',
+  title: 'Sign Up',
   description:
-    'Create a findcheapflights.ai account to subscribe after your free fare hunt.',
+    'Create a Find Cheap Flights account to subscribe after your free fare hunt and keep searching live cheap fares.',
 }
 
 export default function SignUpLayout({ children }: { children: ReactNode }) {

@@ -6,9 +6,9 @@ import type { StoryEntry } from './story'
 export const SITE_NAME = APP_NAME
 export const SITE_DOMAIN = 'findcheapflights.ai'
 
-export const DEFAULT_TITLE = 'Find Cheap Flights — Search for live cheap fares'
+export const DEFAULT_TITLE = 'Find Cheap Flights: Search for Live Cheap Fares'
 export const DEFAULT_DESCRIPTION =
-  'Find cheap flights from nearby airports or to a city you already want. Flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
+  'Find Cheap Flights from nearby airports or a city you already want. Use flexible dates, price bounds, and one free live fare hunt on findcheapflights.ai.'
 export const SHARE_IMAGE_PATH = '/og.png'
 export const SHARE_IMAGE_ALT = 'Find cheap flights. Lock-in the best deals.'
 export const shareImage = {
@@ -51,8 +51,9 @@ export const noIndexMetadata = {
 
 export const notFoundMetadata = {
   ...noIndexMetadata,
-  title: 'Page not found',
-  description: 'This page does not exist on findcheapflights.ai.',
+  title: 'Page Not Found',
+  description:
+    'This page does not exist on Find Cheap Flights. Head home to hunt live cheap fares or browse the guides.',
 } satisfies Metadata
 
 export const INDEXABLE_PATHS = new Set([
@@ -267,7 +268,7 @@ export function storyIndexJsonLd(entries: StoryEntry[]) {
     name: `${SITE_NAME} story`,
     url: `${SITE_URL}/story`,
     description:
-      'A dated journal of what findcheapflights.ai shipped and what is coming next.',
+      'Read a dated journal of what Find Cheap Flights has shipped, plus updates on alerts, onboarding, and what is coming next on findcheapflights.ai.',
     blogPost: entries.map(entry => storyEntryJsonLd(entry)),
   }
 }
@@ -300,7 +301,7 @@ export function blogIndexJsonLd(posts: BlogPost[]) {
     name: `${SITE_NAME} blog`,
     url: `${SITE_URL}/blog`,
     description:
-      'Guides on how to find cheap flights: nearby airports, flexible dates, and live fare hunting.',
+      'Learn how to find cheap flights for free. These guides cover nearby airports, flexible dates, and live fare hunts anywhere in the world on findcheapflights.ai.',
     blogPost: posts.map(post => blogPostJsonLd(post)[0]),
   }
 }

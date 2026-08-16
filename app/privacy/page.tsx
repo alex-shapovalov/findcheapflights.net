@@ -4,9 +4,9 @@ import { CONTACT_EMAIL } from '@/lib/constants'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata = pageMetadata({
-  title: 'Find Cheap Flights — Privacy Policy',
+  title: 'Privacy Policy',
   description:
-    'What findcheapflights.ai collects, why, which providers process it, and how to get your data deleted.',
+    'Learn what Find Cheap Flights collects, why we collect it, which providers process it, and how to request deletion on findcheapflights.ai.',
   path: '/privacy',
 })
 

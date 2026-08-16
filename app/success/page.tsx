@@ -8,8 +8,9 @@ import { billingFromSubscription, getStripe } from '@/lib/stripe'
 
 export const metadata: Metadata = {
   ...noIndexMetadata,
-  title: 'Pro is active',
-  description: 'Your findcheapflights.ai Pro plan is active.',
+  title: 'Pro Is Active',
+  description:
+    'Your Find Cheap Flights Pro plan is active. You now have 100 live cheap-flight hunts each month.',
 }
 
 export default async function SuccessPage({
