@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import { cookies } from 'next/headers'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
@@ -105,6 +106,18 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
           <Footer />
         </Providers>
         <Analytics />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-DDHQMC2TKZ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DDHQMC2TKZ');
+          `}
+        </Script>
       </body>
     </html>
   )
