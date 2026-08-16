@@ -136,7 +136,8 @@ export async function POST(request: Request) {
     }
   }
 
-  const searchId = await convex.mutation(api.searches.create, payload)
+  const { driveHours: _driveHours, ...storedSearch } = payload
+  const searchId = await convex.mutation(api.searches.create, storedSearch)
   return huntResponse(payload, {
     searchId,
     onComplete: result =>

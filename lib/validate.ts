@@ -1,4 +1,11 @@
-import { CONTINENTS, isTravelThemeId, SEARCH_HORIZON_MONTHS } from './constants'
+import {
+  CONTINENTS,
+  isTravelThemeId,
+  NEARBY_DRIVE_HOURS_DEFAULT,
+  NEARBY_DRIVE_HOURS_MAX,
+  NEARBY_DRIVE_HOURS_MIN,
+  SEARCH_HORIZON_MONTHS,
+} from './constants'
 import type { SearchMode, SearchRequest, TripType } from './types'
 
 const IATA = /^[A-Z]{3}$/
@@ -50,6 +57,7 @@ export function parseSearchRequest(body: unknown): SearchRequest {
     dateTo: optionalDate(input.dateTo, 'end date'),
     minNights: optionalNumber(input.minNights, 'min nights'),
     maxNights: optionalNumber(input.maxNights, 'max nights'),
+    driveHours: parseDriveHours(input.driveHours),
     interests: isTravelThemeId(input.interests) ? input.interests : undefined,
   }
 
@@ -64,6 +72,21 @@ function uniqueIatas(value: unknown) {
     .map(item => item.trim().toUpperCase())
     .filter(item => IATA.test(item))
   return [...new Set(codes)].slice(0, 12)
+}
+
+function parseDriveHours(value: unknown) {
+  if (value == null || value === '') return NEARBY_DRIVE_HOURS_DEFAULT
+  const parsed = typeof value === 'number' ? value : Number(value)
+  if (
+    !Number.isInteger(parsed) ||
+    parsed < NEARBY_DRIVE_HOURS_MIN ||
+    parsed > NEARBY_DRIVE_HOURS_MAX
+  ) {
+    throw new Error(
+      `Drive hours must be between ${NEARBY_DRIVE_HOURS_MIN} and ${NEARBY_DRIVE_HOURS_MAX}`,
+    )
+  }
+  return parsed
 }
 
 function optionalNumber(value: unknown, label: string) {

@@ -5,7 +5,16 @@ export const BURST_WINDOW_SECONDS = 60
 export const SEARCH_IP_BURST_LIMIT = 6
 export const SEARCH_USER_BURST_LIMIT = 4
 export const QUOTA_IP_BURST_LIMIT = 60
-export const NEARBY_RADIUS_KM = 560
+export const NEARBY_DRIVE_HOURS_MIN = 1
+export const NEARBY_DRIVE_HOURS_MAX = 10
+export const NEARBY_DRIVE_HOURS_DEFAULT = 6
+export const NEARBY_KM_PER_DRIVE_HOUR = 560 / 6
+export const NEARBY_RADIUS_KM =
+  NEARBY_KM_PER_DRIVE_HOUR * NEARBY_DRIVE_HOURS_DEFAULT
+
+export function nearbyRadiusKm(hours: number = NEARBY_DRIVE_HOURS_DEFAULT) {
+  return hours * NEARBY_KM_PER_DRIVE_HOUR
+}
 export const SEARCH_HORIZON_MONTHS = 24
 export const APP_NAME = 'Find Cheap Flights'
 export const SITE_URL = 'https://findcheapflights.ai'

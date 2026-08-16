@@ -4,7 +4,12 @@ import {
   getAirport,
   nearbyAirports,
 } from './airports'
-import { SEARCH_HORIZON_MONTHS, type TravelThemeId } from './constants'
+import {
+  NEARBY_DRIVE_HOURS_DEFAULT,
+  nearbyRadiusKm,
+  SEARCH_HORIZON_MONTHS,
+  type TravelThemeId,
+} from './constants'
 import type { SearchRequest } from './types'
 
 const THEME_PROMPTS: Record<TravelThemeId, string> = {
@@ -68,7 +73,11 @@ function dateLine(input: SearchRequest, today: string, horizon: string) {
 
 function originBlock(input: SearchRequest) {
   const listed = describeAirports(input.originAirports)
-  const extras = nearbyAirports(input.originAirports)
+  const driveHours = input.driveHours ?? NEARBY_DRIVE_HOURS_DEFAULT
+  const extras = nearbyAirports(
+    input.originAirports,
+    nearbyRadiusKm(driveHours),
+  )
     .slice(0, 12)
     .map(airport => airport.iata)
   const convenience = input.originAirports
@@ -94,7 +103,7 @@ function originBlock(input: SearchRequest) {
   return [
     `Origins: ${listed}.`,
     extras.length
-      ? `Airports within roughly a 6-hour drive that may also be worth a look if the user-selected set is sparse: ${extras.join(', ')}. Prefer the user-selected origins; only use extras when they produce a clearly better deal.`
+      ? `Airports within roughly a ${driveHours}-hour drive that may also be worth a look if the user-selected set is sparse: ${extras.join(', ')}. Prefer the user-selected origins; only use extras when they produce a clearly better deal.`
       : 'Search the listed origins independently.',
     convenience
       ? `${convenience.split(' (')[0]} is the convenience baseline if it is in the origin set, but search ALL listed origins independently and do not stop after finding one deal.`

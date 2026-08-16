@@ -15,6 +15,7 @@ export type SearchRequest = {
   dateTo?: string
   minNights?: number
   maxNights?: number
+  driveHours: number
   interests?: TravelThemeId
 }
 

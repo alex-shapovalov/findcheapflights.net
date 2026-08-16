@@ -10,6 +10,10 @@ import type { Continent, TravelThemeId } from '@/lib/constants'
 import {
   CONTINENTS,
   FREE_SEARCH_LIMIT,
+  NEARBY_DRIVE_HOURS_DEFAULT,
+  NEARBY_DRIVE_HOURS_MAX,
+  NEARBY_DRIVE_HOURS_MIN,
+  nearbyRadiusKm,
   PLANS,
   SEARCH_HORIZON_MONTHS,
   SUBSCRIBER_MONTHLY_LIMIT,
@@ -46,6 +50,7 @@ export function SearchForm() {
   const [dateTo, setDateTo] = useState('')
   const [minNights, setMinNights] = useState('3')
   const [maxNights, setMaxNights] = useState('10')
+  const [driveHours, setDriveHours] = useState(NEARBY_DRIVE_HOURS_DEFAULT)
   const [theme, setTheme] = useState<TravelThemeId | null>(null)
   const [quota, setQuota] = useState<QuotaState>(emptyQuota)
   const [report, setReport] = useState('')
@@ -83,7 +88,10 @@ export function SearchForm() {
   }, [status])
 
   function addNearby() {
-    const extra = nearbyAirports(originAirports).map(airport => airport.iata)
+    const extra = nearbyAirports(
+      originAirports,
+      nearbyRadiusKm(driveHours),
+    ).map(airport => airport.iata)
     setOriginAirports([...new Set([...originAirports, ...extra])].slice(0, 12))
   }
 
@@ -144,6 +152,7 @@ export function SearchForm() {
         tripType === 'round_trip' && minNights ? Number(minNights) : undefined,
       maxNights:
         tripType === 'round_trip' && maxNights ? Number(maxNights) : undefined,
+      driveHours,
       interests: theme ?? undefined,
     }
 
@@ -259,12 +268,30 @@ export function SearchForm() {
             onChange={setOriginAirports}
             placeholder="Pittsburgh, Cleveland, IAD..."
           />
+          <label className="block space-y-2">
+            <span className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-mute">
+              Drive from airport
+              <span className="tracking-normal text-foam">
+                {driveHours} {driveHours === 1 ? 'hour' : 'hours'}
+              </span>
+            </span>
+            <input
+              type="range"
+              min={NEARBY_DRIVE_HOURS_MIN}
+              max={NEARBY_DRIVE_HOURS_MAX}
+              step={1}
+              value={driveHours}
+              onChange={event => setDriveHours(Number(event.target.value))}
+              className="w-full accent-gold"
+            />
+          </label>
           <button
             type="button"
             onClick={addNearby}
             className="w-fit text-xs uppercase tracking-[0.16em] text-teal hover:text-gold"
           >
-            Add airports within ~6 hours
+            Add airports within ~{driveHours}{' '}
+            {driveHours === 1 ? 'hour' : 'hours'}
           </button>
 
           {mode === 'flexible_destination' ? (

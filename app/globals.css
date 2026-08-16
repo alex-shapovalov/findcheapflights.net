@@ -116,6 +116,10 @@ button {
   color-scheme: inherit;
 }
 
+input[type="range"] {
+  accent-color: var(--gold);
+}
+
 .cl-signIn-root,
 .cl-signUp-root,
 .cl-signIn-root .cl-cardBox,
