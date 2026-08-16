@@ -139,17 +139,17 @@ const dealSchema = {
     bookingUrl: {
       ...stringOrNull,
       description:
-        'Required. Prefer a copied Google /travel/flights/booking?tfs=&tfu= or Skyscanner /config/{id} href. Otherwise a dated Google/Kayak/Skyscanner URL for this origin, destination, and dates. Must be fetched in this run before reporting. Never a marketing page. Never null when airports and dates are known.',
+        'Required Google Flights href for this itinerary. Prefer a copied /travel/flights/booking?tfs=&tfu= link. Otherwise a dated Google Flights search. Must be fetched in this run and must have shown this origin, destination, dates, and price. Never a marketing page.',
     },
     sourceUrl: {
-      ...stringOrNull,
+      type: 'string',
       description:
-        'Page where the fare was found, or null. Never a marketing or continent browse page.',
+        'Required. Page where you first saw this fare, or the same Google Flights href. Never a marketing or continent browse page.',
     },
     verifiedLive: {
       ...booleanOrNull,
       description:
-        'True only after bookingUrl was fetched in this run and that page showed this origin, destination, dates, and price.',
+        'True only after the Google Flights bookingUrl was fetched in this run and that page showed this origin, destination, dates, and the same priceUsd. False if you only constructed the URL or the price came from another site.',
     },
     event: eventSchema,
   },
@@ -189,11 +189,11 @@ export const FARE_REPORT_SCHEMA = {
       alsoChecked: {
         type: 'array',
         description:
-          'Expired recaps, stale pages, and routes that were not close enough to list as deals.',
+          'Expired recaps, stale pages, and routes that were not close enough to list as deals. Every item must include a clickable sourceUrl.',
         items: {
           type: 'object',
           additionalProperties: false,
-          required: ['route', 'priceUsd', 'note'],
+          required: ['route', 'priceUsd', 'note', 'sourceUrl'],
           properties: {
             route: {
               type: 'string',
@@ -201,6 +201,11 @@ export const FARE_REPORT_SCHEMA = {
             },
             priceUsd: numberOrNull,
             note: stringOrNull,
+            sourceUrl: {
+              type: 'string',
+              description:
+                'Required. The recap, stale page, or dated Google/Kayak/Skyscanner search you opened for this route. Never null. Never a marketing page.',
+            },
           },
         },
       },

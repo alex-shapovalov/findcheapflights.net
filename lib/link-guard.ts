@@ -265,6 +265,18 @@ export function safeBookingUrl(value: string | undefined) {
   return url
 }
 
+export function routeSearchUrl(
+  originAirport?: string,
+  destinationAirport?: string,
+) {
+  const origin = originAirport?.toUpperCase()
+  const dest = destinationAirport?.toUpperCase()
+  if (!origin || !dest) return undefined
+  return `https://www.google.com/travel/flights?hl=en-US&curr=USD&q=${encodeURIComponent(
+    `Flights from ${origin} to ${dest}`,
+  )}`
+}
+
 export function itinerarySearchUrl(input: {
   originAirport?: string
   destinationAirport?: string

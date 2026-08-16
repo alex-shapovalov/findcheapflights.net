@@ -1,6 +1,7 @@
 import { getAirport, searchAirports } from './airports'
 import {
   itinerarySearchUrl,
+  routeSearchUrl,
   safeBookingUrl,
   safeExternalUrl,
   safeFareUrl,
@@ -69,6 +70,7 @@ export type CheckedFare = {
   route: string
   priceUsd: number | null
   note: string | null
+  sourceUrl: string | null
 }
 
 export type FareReport = {
@@ -126,11 +128,21 @@ function tryParse(candidate: string): Record<string, unknown> | null {
 }
 
 function normalizeReport(raw: Record<string, unknown>): PartialFareReport {
-  const alsoChecked = asRecordList(raw.alsoChecked, 'route').map(item => ({
-    route: asText(item.route),
-    priceUsd: asNumber(item.priceUsd) ?? priceFromText(item.route),
-    note: asText(item.note),
-  }))
+  const alsoChecked = asRecordList(raw.alsoChecked, 'route').map(item => {
+    const route = asText(item.route)
+    const pair = asRoutePair(route)
+    return {
+      route,
+      priceUsd: asNumber(item.priceUsd) ?? priceFromText(route),
+      note: asText(item.note),
+      sourceUrl:
+        asUrl(item.sourceUrl) ??
+        asUrl(item.url) ??
+        urlFromText(item.note) ??
+        urlFromText(route) ??
+        routeSearchUrl(pair.origin, pair.destination),
+    }
+  })
   let deals = asRecordList(raw.deals).map(normalizeDeal)
   if (deals.length === 0) {
     deals = alsoChecked
@@ -141,6 +153,7 @@ function normalizeReport(raw: Record<string, unknown>): PartialFareReport {
           destinationAirport: pair.destination,
           priceUsd: item.priceUsd,
           whyGood: item.note ?? item.route,
+          sourceUrl: item.sourceUrl,
           aboveRequestedCap: true,
           warnings: [
             'Pulled from coverage notes — confirm this fare is still bookable.',
@@ -220,7 +233,8 @@ function normalizeDeal(raw: Record<string, unknown>): Partial<FareDeal> {
     })
   const sourceUrl =
     safeFareUrl(asText(raw.sourceUrl)) ??
-    (keptBooking ? undefined : safeFareUrl(requestedBooking))
+    safeFareUrl(requestedBooking) ??
+    bookingUrl
 
   return {
     destinationCity,
@@ -303,6 +317,15 @@ function asBoolean(value: unknown) {
 
 function asUrl(value: unknown) {
   return safeExternalUrl(asText(value))
+}
+
+function urlFromText(value: unknown) {
+  const text = asText(value)
+  if (!text) return undefined
+  const match = text.match(/(?:https?:\/\/|www\.)[^\s)]+/)
+  if (!match) return undefined
+  const raw = match[0].startsWith('www.') ? `https://${match[0]}` : match[0]
+  return asUrl(raw)
 }
 
 function asTextList(value: unknown) {

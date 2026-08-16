@@ -43,7 +43,7 @@ export const CONTINENTS = [
 export type Continent = (typeof CONTINENTS)[number]
 
 export const TRAVEL_THEMES = [
-  { id: 'electronic', label: 'Electronic & clubs' },
+  { id: 'electronic', label: 'Electronic music & clubs' },
   { id: 'concerts', label: 'Concerts & live music' },
   { id: 'nightlife', label: 'Nightlife & bars' },
   { id: 'cities', label: 'Cities, art & museums' },

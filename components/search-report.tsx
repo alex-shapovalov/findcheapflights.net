@@ -165,6 +165,7 @@ function DealCard({ deal }: { deal: Partial<FareDeal> }) {
   const labels = deal.labels ?? []
   const warnings = deal.warnings ?? []
   const price = formatUsd(deal.priceUsd)
+  const seenOnUrl = deal.sourceUrl ?? deal.bookingUrl ?? undefined
 
   return (
     <article className="rounded-2xl border border-line bg-panel/80 p-5">
@@ -296,14 +297,14 @@ function DealCard({ deal }: { deal: Partial<FareDeal> }) {
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
         )}
-        {deal.sourceUrl && (
+        {seenOnUrl && (
           <a
-            href={deal.sourceUrl}
+            href={seenOnUrl}
             target="_blank"
             rel="noreferrer"
             className="text-sm text-mute underline decoration-line underline-offset-4 hover:text-foam"
           >
-            Seen on {hostLabel(deal.sourceUrl)}
+            Seen on {hostLabel(seenOnUrl)}
           </a>
         )}
       </div>
@@ -357,11 +358,32 @@ function AlsoChecked({ items }: { items: Array<Partial<CheckedFare>> }) {
             key={`${item.route}-${index}`}
             className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm"
           >
-            <span className="text-foam/90">{item.route}</span>
+            {item.sourceUrl ? (
+              <a
+                href={item.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-foam/90 underline decoration-gold/40 underline-offset-4 hover:text-gold"
+              >
+                {item.route}
+              </a>
+            ) : (
+              <span className="text-foam/90">{item.route}</span>
+            )}
             <span className="flex flex-wrap items-center gap-3 text-mute">
               {item.note && <span>{item.note}</span>}
               {formatUsd(item.priceUsd) && (
                 <span className="text-foam/80">{formatUsd(item.priceUsd)}</span>
+              )}
+              {item.sourceUrl && (
+                <a
+                  href={item.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-gold underline decoration-gold/40 underline-offset-4"
+                >
+                  {hostLabel(item.sourceUrl)}
+                </a>
               )}
             </span>
           </li>
