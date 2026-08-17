@@ -5,24 +5,30 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useLayoutEffect,
   useMemo,
   useState,
 } from 'react'
-import { applyTheme, type Theme } from '@/lib/theme'
+import { applyTheme, parseTheme, type Theme } from '@/lib/theme'
 
 const ThemeContext = createContext<{
   theme: Theme
   toggleTheme: () => void
 } | null>(null)
 
-export function ThemeProvider({
-  children,
-  initialTheme,
-}: {
-  children: ReactNode
-  initialTheme: Theme
-}) {
-  const [theme, setTheme] = useState<Theme>(initialTheme)
+function themeFromDocument(): Theme {
+  if (typeof document === 'undefined') return 'dark'
+  return parseTheme(
+    document.documentElement.classList.contains('light') ? 'light' : 'dark',
+  )
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('dark')
+
+  useLayoutEffect(() => {
+    setTheme(themeFromDocument())
+  }, [])
 
   const toggleTheme = useCallback(() => {
     const next = theme === 'dark' ? 'light' : 'dark'

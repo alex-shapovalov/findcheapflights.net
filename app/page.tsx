@@ -1,5 +1,6 @@
+import nextDynamic from 'next/dynamic'
 import { JsonLd } from '@/components/json-ld'
-import { SearchForm } from '@/components/search-form'
+import { SearchFormFallback } from '@/components/search-form-fallback'
 import {
   DEFAULT_DESCRIPTION,
   faqJsonLd,
@@ -9,6 +10,13 @@ import {
   softwareJsonLd,
   websiteJsonLd,
 } from '@/lib/seo'
+
+export const dynamic = 'force-static'
+
+const SearchForm = nextDynamic(
+  () => import('@/components/search-form').then(mod => mod.SearchForm),
+  { loading: () => <SearchFormFallback /> },
+)
 
 export const metadata = pageMetadata({
   description: DEFAULT_DESCRIPTION,

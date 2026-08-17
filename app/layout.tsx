@@ -2,7 +2,6 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import type { Metadata, Viewport } from 'next'
 import { Fraunces, Geist, Geist_Mono } from 'next/font/google'
-import { cookies } from 'next/headers'
 import Script from 'next/script'
 import { Footer } from '@/components/footer'
 import { Header } from '@/components/header'
@@ -16,26 +15,33 @@ import {
   shareImage,
   TITLE_TEMPLATE,
 } from '@/lib/seo'
-import { parseTheme, THEME_STORAGE_KEY } from '@/lib/theme'
+import { THEME_COLORS, THEME_STORAGE_KEY } from '@/lib/theme'
 import './globals.css'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 })
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+  display: 'swap',
+  preload: false,
 })
 
 const fraunces = Fraunces({
   variable: '--font-fraunces',
   subsets: ['latin'],
+  display: 'optional',
+  preload: true,
+  weight: ['400', '600'],
 })
 
 export const viewport: Viewport = {
-  themeColor: '#071018',
+  themeColor: THEME_COLORS.dark.ink,
   width: 'device-width',
   initialScale: 1,
 }
@@ -82,18 +88,31 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({ children }: LayoutProps<'/'>) {
-  const theme = parseTheme((await cookies()).get(THEME_STORAGE_KEY)?.value)
-
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} ${theme} h-full antialiased`}
-      style={{ colorScheme: theme }}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
+      <head>
+        <Script id="theme-boot" strategy="beforeInteractive">{`(function () {
+  try {
+    var stored = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});
+    var t = stored === "light" || stored === "dark" ? stored : "dark";
+    var r = document.documentElement;
+    r.classList.remove("light", "dark");
+    r.classList.add(t);
+    r.style.colorScheme = t;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute("content", t === "light" ? "${THEME_COLORS.light.ink}" : "${THEME_COLORS.dark.ink}");
+    }
+  } catch (e) {}
+})();`}</Script>
+      </head>
       <body className="flex min-h-full flex-col">
-        <Providers initialTheme={theme}>
+        <Providers>
           <a
             href="#main"
             className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold focus:px-3 focus:py-2 focus:text-on-gold"
@@ -110,9 +129,9 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         <SpeedInsights />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-DDHQMC2TKZ"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

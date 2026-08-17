@@ -47,7 +47,6 @@ export function applyTheme(theme: Theme) {
   root.classList.add(theme)
   root.style.colorScheme = theme
   localStorage.setItem(THEME_STORAGE_KEY, theme)
-  document.cookie = `${THEME_STORAGE_KEY}=${theme}; path=/; max-age=31536000; SameSite=Lax`
   const meta = document.querySelector('meta[name="theme-color"]')
   if (meta) {
     meta.setAttribute('content', THEME_COLORS[theme].ink)

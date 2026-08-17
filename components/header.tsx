@@ -20,7 +20,7 @@ const links = [
 export function Header() {
   const { isSignedIn } = useAuth()
   const [open, setOpen] = useState(false)
-  const user = useQuery(api.users.me)
+  const user = useQuery(api.users.me, isSignedIn ? {} : 'skip')
   const subscribed = Boolean(
     user &&
       (user.subscriptionStatus === 'active' ||

@@ -8,7 +8,15 @@ const isProtectedRoute = createRouteMatcher([
   '/api/stripe/portal(.*)',
 ])
 
-export default clerkMiddleware(
+const isClerkRoute = createRouteMatcher([
+  '/history(.*)',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/success(.*)',
+  '/api(.*)',
+])
+
+const clerk = clerkMiddleware(
   async (auth, request) => {
     if (isProtectedRoute(request)) {
       await auth.protect()
@@ -20,6 +28,18 @@ export default clerkMiddleware(
   },
   { signInUrl: '/sign-in', signUpUrl: '/sign-up' },
 )
+
+export default function proxy(
+  ...args: Parameters<typeof clerk>
+): ReturnType<typeof clerk> {
+  const request = args[0]
+  if (!isClerkRoute(request)) {
+    const response = NextResponse.next()
+    response.headers.set('X-Robots-Tag', xRobotsTag(request.nextUrl.pathname))
+    return response
+  }
+  return clerk(...args)
+}
 
 export const config = {
   matcher: [

@@ -39,7 +39,10 @@ const csp = [
 const nextConfig: NextConfig = {
   trailingSlash: false,
   outputFileTracingIncludes: {
-    '/*': ['./content/story/**/*.md', './content/blog/**/*.md'],
+    '/blog': ['./content/blog/**/*.md'],
+    '/blog/[slug]': ['./content/blog/**/*.md'],
+    '/story': ['./content/story/**/*.md'],
+    '/story/[slug]': ['./content/story/**/*.md'],
   },
   async headers() {
     return [
