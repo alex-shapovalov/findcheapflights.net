@@ -27,6 +27,7 @@ export default defineSchema({
 
   searches: defineTable({
     clerkId: v.string(),
+    isGuest: v.optional(v.boolean()),
     mode: searchMode,
     tripType,
     originAirports: v.array(v.string()),

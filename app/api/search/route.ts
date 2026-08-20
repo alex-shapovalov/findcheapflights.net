@@ -7,7 +7,12 @@ import {
   SEARCH_USER_BURST_LIMIT,
   SUBSCRIBER_MONTHLY_LIMIT,
 } from '@/lib/constants'
-import { api, getAuthedConvex } from '@/lib/convex-server'
+import {
+  api,
+  convexServerSecret,
+  getAuthedConvex,
+  getConvexClient,
+} from '@/lib/convex-server'
 import { applyGuestUsageToUser, getGuestId } from '@/lib/guest'
 import { encodeHuntEvent, type HuntClientEvent } from '@/lib/hunt-stream'
 import { streamFlightHunt } from '@/lib/openrouter'
@@ -80,13 +85,49 @@ export async function POST(request: Request) {
     return tooManyRequests('Too many searches at once. Wait a minute.')
   }
 
+  const { driveHours: _driveHours, ...storedSearch } = payload
+
   if (!userId) {
     const guestId = await getGuestId()
     const consumed = await consumeGuestHunt(guestId, ip)
     if (!consumed.allowed) return paywallResponse()
+
+    const convex = getConvexClient()
+    const serverSecret = convexServerSecret()
+    let searchId: Id<'searches'> | undefined
+    try {
+      searchId = await convex.mutation(api.searches.createGuest, {
+        serverSecret,
+        ...storedSearch,
+      })
+    } catch (error) {
+      console.error('Guest search log failed', error)
+    }
+
     return huntResponse(payload, {
-      onFail: (_message, refundable) =>
-        refundable ? refundGuestHunt(guestId, ip) : Promise.resolve(),
+      searchId,
+      onComplete: result =>
+        searchId
+          ? convex.mutation(api.searches.completeGuest, {
+              serverSecret,
+              id: searchId,
+              result,
+            })
+          : Promise.resolve(),
+      onFail: async (message, refundable) => {
+        if (refundable) {
+          await refundGuestHunt(guestId, ip)
+        }
+        if (searchId) {
+          await convex
+            .mutation(api.searches.failGuest, {
+              serverSecret,
+              id: searchId,
+              error: message,
+            })
+            .catch(() => undefined)
+        }
+      },
     })
   }
 
@@ -136,7 +177,6 @@ export async function POST(request: Request) {
     }
   }
 
-  const { driveHours: _driveHours, ...storedSearch } = payload
   const searchId = await convex.mutation(api.searches.create, storedSearch)
   return huntResponse(payload, {
     searchId,
