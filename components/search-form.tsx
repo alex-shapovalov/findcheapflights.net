@@ -1,7 +1,8 @@
 'use client'
 
 import { SignInButton, useUser } from '@clerk/nextjs'
-import { LoaderCircle } from 'lucide-react'
+import { ArrowRight, LoaderCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SearchReport } from '@/components/search-report'
 import { nearbyAirports } from '@/lib/airports'
@@ -37,7 +38,12 @@ const emptyQuota: QuotaState = {
   paywalled: false,
 }
 
-export function SearchForm() {
+export function SearchForm({
+  variant = 'full',
+}: {
+  variant?: 'full' | 'compact'
+}) {
+  const compact = variant === 'compact'
   const { isSignedIn } = useUser()
   const [mode, setMode] = useState<SearchMode>('flexible_destination')
   const [tripType, setTripType] = useState<TripType>('round_trip')
@@ -232,32 +238,38 @@ export function SearchForm() {
       <form
         autoComplete="off"
         onSubmit={onSubmit}
-        className="rounded-3xl border border-line bg-panel/90 p-4 shadow-(--elev) sm:p-8"
+        className={
+          compact
+            ? 'rounded-2xl border border-line bg-panel/90 p-3 shadow-(--elev) sm:p-4'
+            : 'rounded-3xl border border-line bg-panel/90 p-4 shadow-(--elev) sm:p-8'
+        }
       >
-        <div className="mb-6 flex flex-wrap gap-2">
-          {(
-            [
-              ['flexible_destination', 'Nearby airports + continent'],
-              ['flexible_origin', 'Fixed destination'],
-            ] as const
-          ).map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setMode(value)}
-              className={cn(
-                'rounded-full border px-3 py-2 text-xs sm:px-4 sm:text-sm',
-                mode === value
-                  ? 'border-gold bg-gold text-on-gold'
-                  : 'border-line text-mute hover:text-foam',
-              )}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        {!compact && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(
+              [
+                ['flexible_destination', 'Nearby airports + continent'],
+                ['flexible_origin', 'Fixed destination'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setMode(value)}
+                className={cn(
+                  'rounded-full border px-3 py-2 text-xs sm:px-4 sm:text-sm',
+                  mode === value
+                    ? 'border-gold bg-gold text-on-gold'
+                    : 'border-line text-mute hover:text-foam',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
-        <div className="grid gap-5">
+        <div className={compact ? 'grid gap-3' : 'grid gap-5'}>
           <AirportPicker
             label={
               mode === 'flexible_origin'
@@ -268,31 +280,35 @@ export function SearchForm() {
             onChange={setOriginAirports}
             placeholder="Pittsburgh, Cleveland, IAD..."
           />
-          <label className="block space-y-2">
-            <span className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-mute">
-              Drive from airport
-              <span className="tracking-normal text-foam">
-                {driveHours} {driveHours === 1 ? 'hour' : 'hours'}
-              </span>
-            </span>
-            <input
-              type="range"
-              min={NEARBY_DRIVE_HOURS_MIN}
-              max={NEARBY_DRIVE_HOURS_MAX}
-              step={1}
-              value={driveHours}
-              onChange={event => setDriveHours(Number(event.target.value))}
-              className="w-full accent-gold"
-            />
-          </label>
-          <button
-            type="button"
-            onClick={addNearby}
-            className="w-fit text-xs uppercase tracking-[0.16em] text-teal hover:text-gold"
-          >
-            Add airports within ~{driveHours}{' '}
-            {driveHours === 1 ? 'hour' : 'hours'}
-          </button>
+          {!compact && (
+            <>
+              <label className="block space-y-2">
+                <span className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-mute">
+                  Drive from airport
+                  <span className="tracking-normal text-foam">
+                    {driveHours} {driveHours === 1 ? 'hour' : 'hours'}
+                  </span>
+                </span>
+                <input
+                  type="range"
+                  min={NEARBY_DRIVE_HOURS_MIN}
+                  max={NEARBY_DRIVE_HOURS_MAX}
+                  step={1}
+                  value={driveHours}
+                  onChange={event => setDriveHours(Number(event.target.value))}
+                  className="w-full accent-gold"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={addNearby}
+                className="w-fit text-xs uppercase tracking-[0.16em] text-teal hover:text-gold"
+              >
+                Add airports within ~{driveHours}{' '}
+                {driveHours === 1 ? 'hour' : 'hours'}
+              </button>
+            </>
+          )}
 
           {mode === 'flexible_destination' ? (
             <label className="block space-y-2">
@@ -304,7 +320,11 @@ export function SearchForm() {
                 onChange={event =>
                   setContinent(event.target.value as Continent)
                 }
-                className="w-full rounded-xl border border-line bg-panel-2 px-3 py-3 outline-none"
+                className={
+                  compact
+                    ? 'w-full rounded-xl border border-line bg-panel-2 px-3 py-2 text-sm outline-none'
+                    : 'w-full rounded-xl border border-line bg-panel-2 px-3 py-3 outline-none'
+                }
               >
                 {CONTINENTS.map(item => (
                   <option key={item} value={item}>
@@ -322,113 +342,125 @@ export function SearchForm() {
             />
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <fieldset className="space-y-2">
-              <legend className="text-xs uppercase tracking-[0.18em] text-mute">
-                Trip
-              </legend>
-              <div className="flex gap-2">
-                {(
-                  [
-                    ['round_trip', 'Round trip'],
-                    ['one_way', 'One way'],
-                  ] as const
-                ).map(([value, label]) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setTripType(value)}
-                    className={cn(
-                      'flex-1 rounded-xl border px-3 py-2 text-sm',
-                      tripType === value
-                        ? 'border-teal bg-teal/10 text-teal'
-                        : 'border-line text-mute',
-                    )}
-                  >
-                    {label}
-                  </button>
-                ))}
+          {!compact && (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <fieldset className="space-y-2">
+                  <legend className="text-xs uppercase tracking-[0.18em] text-mute">
+                    Trip
+                  </legend>
+                  <div className="flex gap-2">
+                    {(
+                      [
+                        ['round_trip', 'Round trip'],
+                        ['one_way', 'One way'],
+                      ] as const
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setTripType(value)}
+                        className={cn(
+                          'flex-1 rounded-xl border px-3 py-2 text-sm',
+                          tripType === value
+                            ? 'border-teal bg-teal/10 text-teal'
+                            : 'border-line text-mute',
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+                <div className="grid grid-cols-2 gap-3">
+                  <NumberField
+                    label="Min $"
+                    value={minPrice}
+                    onChange={setMinPrice}
+                  />
+                  <NumberField
+                    label="Max $"
+                    value={maxPrice}
+                    onChange={setMaxPrice}
+                  />
+                </div>
               </div>
-            </fieldset>
-            <div className="grid grid-cols-2 gap-3">
-              <NumberField
-                label="Min $"
-                value={minPrice}
-                onChange={setMinPrice}
-              />
-              <NumberField
-                label="Max $"
-                value={maxPrice}
-                onChange={setMaxPrice}
-              />
-            </div>
-          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <DateField
-              label="Search from"
-              value={dateFrom}
-              min={today}
-              max={dateTo || latest}
-              onChange={onDateFromChange}
-            />
-            <DateField
-              label="Search until"
-              value={dateTo}
-              min={dateFrom || today}
-              max={latest}
-              onChange={onDateToChange}
-            />
-          </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <DateField
+                  label="Search from"
+                  value={dateFrom}
+                  min={today}
+                  max={dateTo || latest}
+                  onChange={onDateFromChange}
+                />
+                <DateField
+                  label="Search until"
+                  value={dateTo}
+                  min={dateFrom || today}
+                  max={latest}
+                  onChange={onDateToChange}
+                />
+              </div>
 
-          {tripType === 'round_trip' && (
-            <div className="grid grid-cols-2 gap-3">
-              <NumberField
-                label="Min nights"
-                value={minNights}
-                onChange={setMinNights}
-              />
-              <NumberField
-                label="Max nights"
-                value={maxNights}
-                onChange={setMaxNights}
-              />
-            </div>
+              {tripType === 'round_trip' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <NumberField
+                    label="Min nights"
+                    value={minNights}
+                    onChange={setMinNights}
+                  />
+                  <NumberField
+                    label="Max nights"
+                    value={maxNights}
+                    onChange={setMaxNights}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <span className="block text-xs uppercase tracking-[0.18em] text-mute">
+                  Make it compelling
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {TRAVEL_THEMES.map(item => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      aria-pressed={theme === item.id}
+                      onClick={() =>
+                        setTheme(current =>
+                          current === item.id ? null : item.id,
+                        )
+                      }
+                      className={cn(
+                        'rounded-full border px-3 py-1 text-xs',
+                        theme === item.id
+                          ? 'border-gold text-gold'
+                          : 'border-line text-mute hover:text-foam',
+                      )}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-mute">
+                  Optional. Pick one to weight destinations and dates toward a
+                  theme.
+                </p>
+              </div>
+            </>
           )}
-
-          <div className="space-y-2">
-            <span className="block text-xs uppercase tracking-[0.18em] text-mute">
-              Make it compelling
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {TRAVEL_THEMES.map(item => (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={theme === item.id}
-                  onClick={() =>
-                    setTheme(current => (current === item.id ? null : item.id))
-                  }
-                  className={cn(
-                    'rounded-full border px-3 py-1 text-xs',
-                    theme === item.id
-                      ? 'border-gold text-gold'
-                      : 'border-line text-mute hover:text-foam',
-                  )}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-mute">
-              Optional. Pick one to weight destinations and dates toward a
-              theme.
-            </p>
-          </div>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-mute">
+        <div
+          className={
+            compact
+              ? 'mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'
+              : 'mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'
+          }
+        >
+          <p className={compact ? 'text-xs text-mute' : 'text-sm text-mute'}>
             {quota.subscribed
               ? `${quota.remaining} of ${quota.monthlyLimit} Pro searches left this month`
               : quota.paywalled
@@ -439,7 +471,11 @@ export function SearchForm() {
             <button
               type="submit"
               disabled={status === 'running'}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 font-medium text-on-gold disabled:opacity-60 sm:w-auto"
+              className={
+                compact
+                  ? 'inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold disabled:opacity-60 sm:w-auto'
+                  : 'inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 font-medium text-on-gold disabled:opacity-60 sm:w-auto'
+              }
             >
               {status === 'running' && (
                 <LoaderCircle className="h-4 w-4 animate-spin" />
@@ -450,7 +486,11 @@ export function SearchForm() {
             <button
               type="button"
               onClick={() => startCheckout('month')}
-              className="w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto"
+              className={
+                compact
+                  ? 'w-full rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold sm:w-auto'
+                  : 'w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto'
+              }
             >
               Get Pro
             </button>
@@ -458,13 +498,28 @@ export function SearchForm() {
             <SignInButton mode="modal">
               <button
                 type="button"
-                className="w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto"
+                className={
+                  compact
+                    ? 'w-full rounded-full bg-gold px-5 py-2 text-sm font-medium text-on-gold sm:w-auto'
+                    : 'w-full rounded-full bg-gold px-6 py-3 font-medium text-on-gold sm:w-auto'
+                }
               >
                 Sign in to unlock Pro
               </button>
             </SignInButton>
           )}
         </div>
+        {compact && (
+          <p className="mt-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 py-0.5 text-[10px] leading-none text-mute hover:text-foam"
+            >
+              <ArrowRight className="h-2.5 w-2.5" />
+              (use the full tool here)
+            </Link>
+          </p>
+        )}
       </form>
 
       {hasOutcome && (

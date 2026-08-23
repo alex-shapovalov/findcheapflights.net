@@ -100,6 +100,69 @@ export function getBlogPost(slug: string) {
   return getBlogPosts().find(post => post.slug === slug)
 }
 
+const SENTENCE_RE = /[.!?](?:["')\]]+)?(?=\s|$)/g
+
+function countSentences(text: string) {
+  const plain = text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_`#]/g, '')
+    .trim()
+  if (!plain) return 0
+  return plain.match(SENTENCE_RE)?.length ?? 1
+}
+
+function splitBlockAfterSentences(text: string, count: number) {
+  const matches = [...text.matchAll(SENTENCE_RE)]
+  if (matches.length < count) return null
+  const last = matches[count - 1]
+  const end = (last.index ?? 0) + last[0].length
+  return {
+    before: text.slice(0, end).trim(),
+    after: text.slice(end).trim(),
+  }
+}
+
+export function splitBlogAfterIntro(body: string, minSentences = 2) {
+  const blocks = body
+    .split(/\n{2,}/)
+    .map(part => part.trim())
+    .filter(Boolean)
+  let sentences = 0
+  let index = 0
+  let beforeTail = ''
+  let afterHead = ''
+  for (; index < blocks.length; index += 1) {
+    const block = blocks[index]
+    if (block.startsWith('#')) {
+      if (sentences > 0) break
+      continue
+    }
+    const remaining = minSentences - sentences
+    const split = splitBlockAfterSentences(block, remaining)
+    if (split) {
+      beforeTail = split.before
+      afterHead = split.after
+      break
+    }
+    sentences += countSentences(block)
+  }
+  const beforeBlocks = blocks.slice(0, index)
+  if (beforeTail) beforeBlocks.push(beforeTail)
+  if (index === 0 && !beforeTail) {
+    beforeBlocks.push(blocks[0] ?? '')
+    index = 1
+    afterHead = ''
+  }
+  const afterBlocks = [
+    ...(afterHead ? [afterHead] : []),
+    ...blocks.slice(index + (beforeTail ? 1 : 0)),
+  ]
+  return {
+    before: beforeBlocks.filter(Boolean).join('\n\n'),
+    after: afterBlocks.filter(Boolean).join('\n\n'),
+  }
+}
+
 const MONTHS = [
   'January',
   'February',

@@ -1,8 +1,17 @@
+import nextDynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Markdown } from '@/components/markdown'
-import { type BlogPost, formatBlogDate } from '@/lib/blog'
+import { SearchFormFallback } from '@/components/search-form-fallback'
+import { type BlogPost, formatBlogDate, splitBlogAfterIntro } from '@/lib/blog'
+
+const SearchForm = nextDynamic(
+  () => import('@/components/search-form').then(mod => mod.SearchForm),
+  { loading: () => <SearchFormFallback compact /> },
+)
 
 export function BlogArticle({ post }: { post: BlogPost }) {
+  const { before, after } = splitBlogAfterIntro(post.body)
+
   return (
     <article>
       <p className="text-xs uppercase tracking-[0.16em] text-mute">
@@ -13,7 +22,11 @@ export function BlogArticle({ post }: { post: BlogPost }) {
       </h1>
       <p className="mt-4 text-lg text-mute">{post.description}</p>
       <div className="mt-8">
-        <Markdown content={post.body} />
+        {before ? <Markdown content={before} /> : null}
+        <div className="my-8">
+          <SearchForm variant="compact" />
+        </div>
+        {after ? <Markdown content={after} /> : null}
       </div>
       <p className="mt-12 rounded-2xl border border-line bg-panel px-5 py-5">
         <span className="font-medium text-foam">Ready to hunt?</span>{' '}

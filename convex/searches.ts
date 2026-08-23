@@ -53,7 +53,11 @@ type SearchCreateInput = {
   interests?: string
 }
 
-function searchFields(args: SearchCreateInput, clerkId: string, isGuest: boolean) {
+function searchFields(
+  args: SearchCreateInput,
+  clerkId: string,
+  isGuest: boolean,
+) {
   const originAirports = iataCodes(args.originAirports)
   if (originAirports.length === 0) {
     throw new Error('At least one origin airport is required')
